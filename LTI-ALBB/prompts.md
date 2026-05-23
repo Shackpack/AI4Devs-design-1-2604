@@ -277,3 +277,161 @@ Describe el customer journey de un candidato que pase por todo el ciclo del proy
 - **Mensajería interna**: Comunicación directa
 - **Videoconferencia**: Entrevistas y reuniones
 - **Notificaciones push**: Alertas en tiempo real
+
+---
+
+# Prompt 4
+
+Crea un diagrama Lean Canvas para el sistema de reclutamiento LTI (ATS del futuro). El Lean Canvas debe incluir los 9 bloques estándar: Problema, Segmentos de Clientes, Propuesta de Valor Única, Solución, Canales, Flujos de Ingresos, Estructura de Costos, Métricas Clave y Ventaja Injusta. Basa el contenido en las funcionalidades y beneficios descritos anteriormente.
+
+---
+
+## Respuesta
+
+# Lean Canvas - Modelo de Negocio LTI
+
+### 1. Problema
+
+**Problemas de los clientes (Empresas/RRHH):**
+- Procesos de reclutamiento manuales y lentos
+- Dificultad para gestionar grandes volúmenes de candidaturas
+- Falta de centralización de información de candidatos
+- Tiempos de contratación excesivos
+- Ausencia de métricas para optimizar el proceso
+- Comunicación fragmentada con candidatos
+- Sesgos en la selección por falta de estandarización
+
+**Problemas de los candidatos:**
+- Falta de transparencia en el estado de su candidatura
+- Procesos de postulación complejos y repetitivos
+- Comunicación escasa o nula con las empresas
+- Experiencia inconsistente entre diferentes empresas
+- Dificultad para reutilizar su perfil en futuras oportunidades
+
+### 2. Segmentos de Clientes
+
+**Segmento Primario:**
+- Empresas medianas y grandes (50-5000 empleados)
+- Departamentos de RRHH y Talent Acquisition
+- Startups en fase de crecimiento
+- Agencias de reclutamiento
+
+**Segmento Secundario:**
+- Pequeñas empresas (10-50 empleados) con necesidades de hiring
+- Consultoras de RRHH
+- Empresas con alta rotación de personal
+
+**Usuarios Finales:**
+- Reclutadores y RRHH
+- Hiring Managers
+- Candidatos (usuarios del sistema)
+
+### 3. Propuesta de Valor Única
+
+**Para Empresas:**
+- "Reduce tu tiempo de contratación en un 50% con automatización inteligente"
+- "Centraliza todo tu proceso de reclutamiento en una plataforma intuitiva"
+- "Toma decisiones basadas en datos con analytics en tiempo real"
+
+**Para Candidatos:**
+- "Experiencia de postulación transparente y profesional"
+- "Seguimiento en tiempo real de tus candidaturas"
+- "Un perfil para aplicar a múltiples oportunidades"
+
+**Diferenciadores:**
+- IA para matching candidato-puesto
+- Colaboración en tiempo real entre reclutadores y managers
+- Integración multi-canal nativa
+- UX moderna y mobile-first
+
+### 4. Solución
+
+**Plataforma ATS con:**
+- Gestión completa del ciclo de vida del candidato
+- Pipeline visual tipo Kanban
+- Sistema de evaluaciones técnicas integrado
+- Programación automatizada de entrevistas
+- Publicación multi-canal (redes sociales, portales)
+- Sistema de notificaciones y comunicación
+- Analytics y reportes avanzados
+- IA para preselección y matching
+- Portal de onboarding digital
+
+### 5. Canales
+
+**Adquisición de Clientes:**
+- Marketing digital (SEO, SEM, LinkedIn Ads)
+- Content marketing (blog, webinars, whitepapers)
+- Ventas directas B2B
+- Partnerships con consultoras de RRHH
+- Presencia en eventos de HR Tech
+- Free trial / Freemium para captación
+
+**Canales de Distribución:**
+- SaaS (Software as a Service) - web
+- Demostraciones personalizadas
+- Integraciones con herramientas existentes
+- Marketplace de integraciones
+
+### 6. Flujos de Ingresos
+
+**Modelo de Suscripción:**
+- **Starter**: $299/mes - hasta 50 vacantes activas
+- **Professional**: $699/mes - hasta 200 vacantes activas + analytics avanzado
+- **Enterprise**: $1,499+/mes - vacantes ilimitadas + API + soporte dedicado
+
+**Ingresos Adicionales:**
+- Integraciones premium ($99/mes cada una)
+- Evaluaciones técnicas terceras ($5-15 por evaluación)
+- Servicios de implementación ($2,000-10,000 one-time)
+- Training y consultoría ($150/hora)
+
+### 7. Estructura de Costos
+
+**Costos Fijos:**
+- Desarrollo y mantenimiento del software ($15,000-25,000/mes)
+- Infraestructura cloud y servidores ($3,000-8,000/mes)
+- Salarios del equipo (fundadores + desarrolladores + ventas)
+- Oficina y operaciones ($5,000-10,000/mes)
+
+**Costos Variables:**
+- Marketing y adquisición de clientes ($500-2,000 por cliente)
+- Costos de integraciones terceras
+- Comisiones de ventas (10-20%)
+- Soporte al cliente escalado
+
+**Costos Únicos:**
+- Desarrollo inicial del producto
+- Certificaciones y compliance
+- Branding y diseño
+
+### 8. Métricas Clave
+
+**Métricas de Adquisición:**
+- CAC (Costo de Adquisición de Cliente)
+- MRR/ARR (Monthly/Annual Recurring Revenue)
+- Tasa de conversión de trial a pago
+- Churn rate (tasa de cancelación)
+
+**Métricas de Producto:**
+- DAU/MAU (Daily/Monthly Active Users)
+- Tiempo promedio de contratación (por cliente)
+- Número de vacantes gestionadas
+- Tasa de completitud de perfiles de candidatos
+
+**Métricas de Satisfacción:**
+- NPS (Net Promoter Score)
+- CSAT (Customer Satisfaction Score)
+- Tiempo de respuesta a soporte
+- Tasa de adopción de funcionalidades
+
+### 9. Ventaja Injusta
+
+**Ventajas Competitivas:**
+- **Tecnología propietaria de IA** para matching candidato-puesto
+- **Experiencia del equipo** en HR Tech y reclutamiento
+- **Integraciones nativas** con principales plataformas (LinkedIn, Indeed, etc.)
+- **UX superior** basada en research profundo con usuarios
+- **First-mover advantage** en ciertas funcionalidades de automatización
+- **Comunidad activa** de reclutadores que generan feedback continuo
+- **Data exclusiva** sobre tendencias de reclutamiento
