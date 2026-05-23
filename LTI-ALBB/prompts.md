@@ -81,3 +81,199 @@ Descríbelos en un listado, separando los beneficios por cada grupo.
 - **Reducción de la brecha**: Proceso estandarizado reduce sesgos en la selección
 - **Profesionalismo**: Interacción con empresa moderna y tecnológicamente avanzada
 - **Reutilización de perfil**: Información guardada para aplicar a futuras vacantes rápidamente
+
+---
+
+# Prompt 3
+
+Describe el customer journey de un candidato que pase por todo el ciclo del proyecto de reclutamiento LTI. Descríbeme paso a paso todas las interacciones desde que descubre la oferta hasta que es contratado (o rechazado).
+
+---
+
+## Respuesta
+
+# Customer Journey del Candidato en el Sistema LTI
+
+## Fase 1: Descubrimiento de la Oferta
+
+**Paso 1: Visualización de la oferta**
+- El candidato ve la oferta de empleo publicada en múltiples canales:
+  - Redes sociales (LinkedIn, Twitter, Facebook)
+  - Portales de empleo
+  - Sitio web de la empresa
+- Interacción: Clic en el anuncio para ver detalles completos
+
+**Paso 2: Revisión de la oferta**
+- El candidato accede a la página de la oferta donde visualiza:
+  - Descripción detallada del puesto
+  - Requisitos y habilidades necesarias
+  - Salario y beneficios
+  - Ubicación
+  - Información sobre la empresa
+- Interacción: Lectura completa y evaluación de alineación con su perfil
+
+## Fase 2: Registro y Postulación
+
+**Paso 3: Registro en el sistema**
+- El candidato decide aplicar y se registra en la plataforma:
+  - Crea cuenta con email y contraseña
+  - Opción de registro con LinkedIn/Google
+- Interacción: Formulario de registro con validación de datos
+
+**Paso 4: Completación de perfil**
+- El candidato completa su perfil con:
+  - Información personal básica
+  - Experiencia laboral
+  - Educación
+  - Habilidades técnicas y blandas
+- Interacción: Formularios dinámicos según el tipo de perfil
+
+**Paso 5: Carga de documentos**
+- El candidato carga los documentos requeridos:
+  - CV (PDF, Word)
+  - Carta de presentación
+  - Portafolio (si aplica)
+  - Certificaciones
+- Interacción: Upload de archivos con validación de formato y tamaño
+
+**Paso 6: Envío de postulación**
+- El candidato revisa su aplicación antes de enviar
+- Interacción: Botón "Enviar postulación" con confirmación
+- Recibe notificación de confirmación inmediata
+
+## Fase 3: Seguimiento de Candidatura
+
+**Paso 7: Estado "Recibido"**
+- El candidato accede a su panel de candidato
+- Visualiza su candidatura en estado "Recibido"
+- Interacción: Dashboard con lista de sus postulaciones y estados
+
+**Paso 8: Notificación de revisión**
+- Recibe notificación automática cuando la candidatura pasa a "En revisión"
+- Canal: Email y notificación en plataforma
+- Interacción: Click en notificación para ver detalles
+
+## Fase 4: Evaluación Técnica
+
+**Paso 9: Invitación a prueba técnica**
+- Si es preseleccionado, recibe invitación a prueba técnica:
+  - Email con instrucciones
+  - Fecha límite para completar
+  - Enlace a la plataforma de evaluación
+- Interacción: Aceptación de la prueba
+
+**Paso 10: Realización de prueba técnica**
+- El candidato accede a la plataforma de evaluaciones:
+  - Tests de habilidades técnicas
+  - Cuestionarios psicométricos
+  - Ejercicios prácticos
+- Interacción: Navegación por preguntas, respuestas, envío de prueba
+
+**Paso 11: Confirmación de recepción**
+- Recibe confirmación de que su prueba fue recibida
+- Interacción: Notificación de "Prueba enviada correctamente"
+
+## Fase 5: Entrevista
+
+**Paso 12: Invitación a entrevista**
+- Si pasa la prueba técnica, recibe invitación a entrevista:
+  - Email con propuesta de fechas/horas
+  - Enlace a calendario para agendar
+  - Información sobre el formato (video, presencial)
+- Interacción: Selección de fecha y hora disponible
+
+**Paso 13: Confirmación de entrevista**
+- Recibe confirmación con detalles:
+  - Fecha y hora confirmada
+  - Enlace a videoconferencia (si aplica)
+  - Nombres de los entrevistadores
+  - Recordatorio automático 24h antes
+- Interacción: Agendar en calendario personal
+
+**Paso 14: Realización de entrevista**
+- El candidato asiste a la entrevista:
+  - Acceso a plataforma de videoconferencia
+  - Compartir pantalla si es necesario
+  - Interacción con reclutadores y managers
+- Interacción: Conversación, presentación, preguntas y respuestas
+
+## Fase 6: Oferta de Empleo
+
+**Paso 15: Notificación de decisión**
+- Recibe notificación sobre el resultado de la entrevista
+- Interacción: Email y notificación en plataforma
+
+**Paso 16: Recepción de oferta (si es seleccionado)**
+- Si es seleccionado, recibe la oferta formal:
+  - Carta de oferta detallada
+  - Condiciones salariales y beneficios
+  - Fecha de incorporación propuesta
+  - Plazo para responder
+- Interacción: Revisión detallada de la oferta
+
+**Paso 17: Negociación (opcional)**
+- El candidato puede solicitar negociación:
+  - A través de mensajería interna
+  - O videoconferencia con RRHH
+- Interacción: Comunicación bidireccional
+
+**Paso 18: Aceptación de oferta**
+- El candidato acepta la oferta:
+  - Botón "Aceptar oferta" en plataforma
+  - Firma digital de documentos
+- Interacción: Confirmación formal de aceptación
+
+## Fase 7: Onboarding
+
+**Paso 19: Inicio de proceso de onboarding**
+- El candidato accede al portal de onboarding:
+  - Checklist de incorporación
+  - Documentación legal requerida
+  - Formularios de bienvenida
+- Interacción: Completación de tareas pendientes
+
+**Paso 20: Carga de documentación**
+- Sube documentos requeridos:
+  - DNI/Pasaporte
+  - Certificados de estudios
+  - Contrato firmado
+  - Datos bancarios
+- Interacción: Upload de documentos con validación
+
+**Paso 21: Finalización de onboarding**
+- Recibe confirmación de que todo está completo
+- Interacción: Notificación de "Bienvenido al equipo"
+
+**Paso 22: Primer día**
+- El candidato ahora es empleado:
+  - Acceso a sistemas internos
+  - Asignación de recursos
+  - Presentación al equipo
+- Interacción: Transición a empleado activo
+
+## Fase Alternativa: Rechazo
+
+**Paso 15-18 (Alternativa): Notificación de rechazo**
+- Si no es seleccionado, recibe notificación:
+  - Email con feedback (si está configurado)
+  - Información sobre el motivo genérico
+  - Agradecimiento por el interés
+- Interacción: Lectura de notificación
+- Su perfil permanece en el sistema para futuras oportunidades
+
+## Puntos de Contacto Clave
+
+1. **Notificaciones automáticas** en cada cambio de estado
+2. **Dashboard del candidato** con seguimiento en tiempo real
+3. **Mensajería interna** para comunicación directa
+4. **Calendario integrado** para gestión de entrevistas
+5. **Portal de documentos** centralizado
+6. **Feedback estructurado** en cada etapa del proceso
+
+## Canales de Comunicación
+
+- **Email**: Notificaciones importantes y documentación
+- **Plataforma web**: Interacción principal
+- **Mensajería interna**: Comunicación directa
+- **Videoconferencia**: Entrevistas y reuniones
+- **Notificaciones push**: Alertas en tiempo real
