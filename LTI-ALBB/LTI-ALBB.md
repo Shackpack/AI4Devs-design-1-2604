@@ -239,3 +239,37 @@ Sistema de reclutamiento de talento que permite anunciar puestos de trabajo, pub
 - **First-mover advantage** en ciertas funcionalidades de automatización
 - **Comunidad activa** de reclutadores que generan feedback continuo
 - **Data exclusiva** sobre tendencias de reclutamiento
+
+---
+
+## Diagrama Lean Canvas (Mermaid)
+
+```mermaid
+graph TB
+    subgraph Lean_Canvas["Lean Canvas - LTI"]
+        subgraph Top_Row["Fila Superior"]
+            P[Problema<br/>• Procesos manuales lentos<br/>• Falta de centralización<br/>• Tiempos excesivos<br/>• Sin métricas<br/>• Comunicación fragmentada<br/>• Sesgos en selección]
+            S[Segmentos de Clientes<br/>• Empresas 50-5000 empleados<br/>• RRHH y Talent Acquisition<br/>• Startups en crecimiento<br/>• Agencias de reclutamiento]
+            PV[Propuesta de Valor<br/>• Reduce tiempo 50%<br/>• Centralización total<br/>• Analytics en tiempo real<br/>• IA para matching<br/>• Colaboración real-time]
+        end
+
+        subgraph Middle_Row["Fila Media"]
+            SOL[Solución<br/>• Gestión ciclo completo<br/>• Pipeline Kanban<br/>• Evaluaciones técnicas<br/>• Programación entrevistas<br/>• Publicación multi-canal<br/>• Notificaciones<br/>• Analytics avanzados<br/>• IA preselección<br/>• Onboarding digital]
+            CAN[Canales<br/>• Marketing digital<br/>• Content marketing<br/>• Ventas B2B<br/>• Partnerships<br/>• Eventos HR Tech<br/>• Free trial]
+        end
+
+        subgraph Bottom_Row["Fila Inferior"]
+            FI[Flujos de Ingresos<br/>• Starter: $299/mes<br/>• Professional: $699/mes<br/>• Enterprise: $1,499+/mes<br/>• Integraciones premium<br/>• Evaluaciones técnicas<br/>• Implementación<br/>• Training]
+            EC[Estructura de Costos<br/>• Desarrollo: $15-25K/mes<br/>• Infraestructura: $3-8K/mes<br/>• Salarios equipo<br/>• Oficina: $5-10K/mes<br/>• Marketing por cliente<br/>• Comisiones ventas]
+            MC[Métricas Clave<br/>• CAC, MRR/ARR<br/>• Conversión trial<br/>• Churn rate<br/>• DAU/MAU<br/>• Tiempo contratación<br/>• NPS, CSAT]
+            VI[Ventaja Injusta<br/>• IA propietaria<br/>• Experiencia equipo<br/>• Integraciones nativas<br/>• UX superior<br/>• First-mover<br/>• Comunidad activa<br/>• Data exclusiva]
+        end
+    end
+
+    P --> S
+    S --> PV
+    SOL --> CAN
+    FI --> EC
+    EC --> MC
+    MC --> VI
+```
