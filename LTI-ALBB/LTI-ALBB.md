@@ -1087,6 +1087,151 @@ erDiagram
 
 ---
 
+## Diagrama C4 - Sistema de Registro de Usuarios
+
+### Contexto del Componente
+
+El sistema de registro de usuarios es un componente crítico que permite a nuevos usuarios (candidatos, reclutadores, hiring managers) crear cuentas en el sistema LTI. Este componente gestiona todo el flujo desde la captura de datos hasta la activación de la cuenta con autenticación multifactor (MFA).
+
+### Diagrama de Componentes (C4 Level 3)
+
+```mermaid
+flowchart TB
+    subgraph "Frontend - Aplicación Web"
+        UI[UI de Registro]
+        Form[Formulario de Registro]
+        MFASetup[Configuración MFA]
+    end
+
+    subgraph "API Gateway"
+        Gateway[API Gateway]
+        Auth[Autenticación Middleware]
+    end
+
+    subgraph "Servicio de Registro - User Registration Service"
+        Controller[Registration Controller]
+        Validator[Data Validator]
+        PasswordHasher[Password Hasher]
+        MFAService[MFA Service]
+        UserCreator[User Creator]
+        EmailService[Email Service]
+        AuditLogger[Audit Logger]
+    end
+
+    subgraph "Capa de Datos"
+        UserDB[(Usuario Database)]
+        AuditDB[(Auditoría Database)]
+    end
+
+    subgraph "Servicios Externos"
+        EmailProvider[Email Provider<br/>SendGrid/Ses]
+        MFASecret[MFA Secret Generator<br/>TOTP]
+    end
+
+    UI -->|1. Submit Registration| Form
+    Form -->|2. POST /api/register| Gateway
+    Gateway -->|3. Route| Auth
+    Auth -->|4. Validate Token| Controller
+    Controller -->|5. Validate Data| Validator
+    Validator -->|6. Check Format| PasswordHasher
+    PasswordHasher -->|7. Hash Password| MFAService
+    MFAService -->|8. Generate Secret| MFASecret
+    MFASecret -->|9. Return Secret| MFAService
+    MFAService -->|10. Generate QR Code| MFASetup
+    MFASetup -->|11. Scan QR Code| Form
+    Form -->|12. Verify MFA| MFAService
+    MFAService -->|13. Verify Code| UserCreator
+    UserCreator -->|14. Insert User| UserDB
+    UserDB -->|15. Success| EmailService
+    EmailService -->|16. Send Welcome Email| EmailProvider
+    EmailProvider -->|17. Email Sent| UserCreator
+    UserCreator -->|18. Log Registration| AuditLogger
+    AuditLogger -->|19. Insert Audit Record| AuditDB
+    AuditDB -->|20. Success| Controller
+    Controller -->|21. Return Response| Gateway
+    Gateway -->|22. Return 201 Created| UI
+
+    style UI fill:#e1f5ff
+    style Form fill:#e1f5ff
+    style MFASetup fill:#e1f5ff
+    style Gateway fill:#fff4e1
+    style Auth fill:#fff4e1
+    style Controller fill:#d4edda
+    style Validator fill:#d4edda
+    style PasswordHasher fill:#d4edda
+    style MFAService fill:#d4edda
+    style UserCreator fill:#d4edda
+    style EmailService fill:#d4edda
+    style AuditLogger fill:#d4edda
+    style UserDB fill:#f8d7da
+    style AuditDB fill:#f8d7da
+    style EmailProvider fill:#ffe4e1
+    style MFASecret fill:#ffe4e1
+```
+
+### Descripción de Componentes
+
+#### Frontend - Aplicación Web
+- **UI de Registro**: Interfaz de usuario principal para el registro
+- **Formulario de Registro**: Captura datos del usuario (email, contraseña, nombre, apellido, teléfono, rol)
+- **Configuración MFA**: Interfaz para escanear código QR y verificar autenticación multifactor
+
+#### API Gateway
+- **API Gateway**: Punto de entrada único para todas las solicitudes API
+- **Autenticación Middleware**: Valida tokens y rate limiting antes de procesar solicitudes
+
+#### Servicio de Registro - User Registration Service
+- **Registration Controller**: Controlador REST que expone endpoints de registro
+- **Data Validator**: Valida formato de email, contraseña, teléfono según RFC y restricciones
+- **Password Hasher**: Genera hash seguro de contraseñas usando bcrypt/argon2
+- **MFA Service**: Gestiona generación de secretos TOTP y verificación de códigos
+- **User Creator**: Orquesta la creación de usuarios en base de datos
+- **Email Service**: Envía emails de bienvenida y verificación
+- **Audit Logger**: Registra todos los eventos de registro para auditoría
+
+#### Capa de Datos
+- **Usuario Database**: Almacena usuarios con campos encriptados (password_hash, mfa_secret)
+- **Auditoría Database**: Almacena registros de auditoría con timestamp y dirección IP
+
+#### Servicios Externos
+- **Email Provider**: Servicio externo para envío de emails (SendGrid, AWS SES)
+- **MFA Secret Generator**: Generador de secretos TOTP para autenticación multifactor
+
+### Flujo de Datos
+
+1. **Captura de Datos**: El usuario completa el formulario de registro con sus datos personales
+2. **Validación de Entrada**: El Data Validator verifica formato de email (RFC 5322), contraseña (mínimo 8 caracteres, mayúsculas, minúsculas, números), y teléfono (formato internacional)
+3. **Hash de Contraseña**: La contraseña se hashea usando bcrypt con salt antes de almacenarse
+4. **Configuración MFA**: Se genera un secreto TOTP único y se muestra un código QR al usuario
+5. **Verificación MFA**: El usuario escanea el QR con su app de autenticación y verifica el código
+6. **Creación de Usuario**: Se inserta el registro en la tabla Usuario con estado_cuenta = PENDIENTE
+7. **Envío de Email**: Se envía email de bienvenida con instrucciones para activar la cuenta
+8. **Auditoría**: Se registra el evento de registro con timestamp, dirección IP y user agent
+9. **Respuesta**: Se retorna respuesta 201 Created con datos básicos del usuario (sin información sensible)
+
+### Tecnologías Sugeridas
+
+- **Frontend**: React.js, TypeScript, Material-UI
+- **Backend**: Node.js, Express.js, TypeScript
+- **Base de Datos**: PostgreSQL (para relaciones complejas) o MongoDB (para flexibilidad)
+- **Autenticación**: JWT, bcrypt, speakeasy (para TOTP)
+- **Email**: SendGrid o AWS SES
+- **API Gateway**: Kong o AWS API Gateway
+- **Logging**: Winston o Pino
+- **Monitoring**: Prometheus, Grafana
+
+### Consideraciones de Seguridad
+
+- Las contraseñas nunca se almacenan en texto plano
+- El secreto MFA se encripta en la base de datos
+- Rate limiting en el endpoint de registro para prevenir ataques de fuerza bruta
+- Validación de email para prevenir registros con emails temporales
+- Auditoría completa de todos los eventos de registro
+- HTTPS obligatorio para todas las comunicaciones
+- Sanitización de todos los inputs para prevenir XSS y SQL injection
+
+---
+
 ## Estado del Proyecto
  
 - **Especificación funcional**: Completada

@@ -749,3 +749,53 @@ Refactorizar el modelo de datos: la tabla Candidato necesita una tabla auxiliar 
 - Mantenibilidad: cambios en recursos externos no afectan la estructura principal del candidato
 
 ---
+
+# Prompt 11
+
+Crear un diagrama C4 correspondiente al componente del sistema de registro de un nuevo usuario.
+
+---
+
+## Respuesta
+
+[Se ha creado un diagrama C4 Level 3 (Component Diagram) en Mermaid para el sistema de registro de usuarios en el documento LTI-ALBB.md]
+
+**Componentes incluidos en el diagrama:**
+
+**Frontend - Aplicación Web:**
+- UI de Registro
+- Formulario de Registro
+- Configuración MFA
+
+**API Gateway:**
+- API Gateway
+- Autenticación Middleware
+
+**Servicio de Registro - User Registration Service:**
+- Registration Controller
+- Data Validator
+- Password Hasher
+- MFA Service
+- User Creator
+- Email Service
+- Audit Logger
+
+**Capa de Datos:**
+- Usuario Database
+- Auditoría Database
+
+**Servicios Externos:**
+- Email Provider (SendGrid/Ses)
+- MFA Secret Generator (TOTP)
+
+**Características del diagrama:**
+- Flujo completo de 22 pasos desde la captura de datos hasta la respuesta
+- Validación de datos según RFC 5322 para email y formato internacional para teléfono
+- Hash de contraseñas con bcrypt/argon2
+- Configuración de autenticación multifactor (MFA) con TOTP y código QR
+- Envío de email de bienvenida
+- Auditoría completa de eventos
+- Consideraciones de seguridad detalladas
+- Tecnologías sugeridas para implementación
+
+---
