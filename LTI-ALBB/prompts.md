@@ -799,3 +799,69 @@ Crear un diagrama C4 correspondiente al componente del sistema de registro de un
 - Tecnologías sugeridas para implementación
 
 ---
+
+# Prompt 12
+
+Implementar la Arquitectura del Sistema a Alto Nivel con un diagrama que muestre la estructura técnica general del sistema completo LTI (ATS del futuro). La arquitectura debe estar basada en las mejores prácticas para un ATS moderno y debe incluir:
+
+1. **Visión general** del patrón arquitectónico seleccionado
+2. **Stack tecnológico recomendado** para cada capa del sistema (frontend, backend, base de datos, almacenamiento, mensajería, infraestructura, servicios externos)
+3. **Diagrama de arquitectura de alto nivel** en Mermaid que muestre:
+   - Capa de cliente (web, móvil)
+   - CDN y seguridad
+   - API Gateway
+   - Capa de aplicación con servicios core y de soporte
+   - Cola de mensajes
+   - Capa de datos (bases de datos, cache, búsqueda)
+   - Capa de almacenamiento (S3, CDN)
+   - Servicios externos (email, redes sociales, videoconferencia, antivirus)
+   - Monitoreo y logging
+4. **Descripción detallada de cada componente** del sistema
+5. **Flujos de datos típicos** (postulación de candidato, gestión de pipeline)
+6. **Estrategia de escalabilidad** (horizontal, vertical, evolución por fases)
+7. **Consideraciones de seguridad** (autenticación, autorización, encriptación, compliance)
+8. **Estrategia de despliegue** (desarrollo, staging, producción)
+9. **Tecnologías alternativas consideradas** con justificación
+
+La arquitectura debe ser escalable, mantenible y permitir evolución desde un MVP hacia una arquitectura de microservicios según las necesidades del negocio.
+
+---
+
+## Respuesta
+
+[Se ha implementado la Arquitectura del Sistema a Alto Nivel en el documento LTI-ALBB.md con las siguientes características:]
+
+**Patrón Arquitectónico:**
+- Arquitectura modular con dominios separados
+- Balance entre simplicidad para MVP y capacidad de escalar hacia microservicios
+
+**Stack Tecnológico Recomendado:**
+- **Frontend**: Next.js 14+ + TypeScript + shadcn/ui + TailwindCSS
+- **Backend**: NestJS (Node.js + TypeScript) con arquitectura modular
+- **Base de Datos**: PostgreSQL 15+ (principal) + Redis 7+ (cache/sesiones)
+- **ORM**: Prisma (type-safe, migrations automáticas)
+- **Almacenamiento**: AWS S3 o DigitalOcean Spaces + Cloudflare CDN
+- **Mensajería**: Redis + BullMQ para colas asíncronas
+- **Infraestructura**: Docker → Kubernetes (producción)
+- **Monitoring**: Prometheus + Grafana + ELK Stack + Jaeger
+
+**Diagrama de Arquitectura:**
+- Diagrama Mermaid con 9 capas principales
+- 8 servicios core (Auth, User, Candidate, Job, Application, Evaluation, Interview, Notification)
+- 4 servicios de soporte (File, Search, Analytics, Audit)
+- Integración con servicios externos (Email, Social APIs, Video Conference, Antivirus)
+- Sistema de monitoreo completo (Prometheus, Grafana, ELK, Jaeger)
+
+**Estrategia de Evolución:**
+- Fase 1 (MVP): Monolito modular con Docker Compose
+- Fase 2 (Growth): Separar servicios críticos como microservicios
+- Fase 3 (Scale): Arquitectura completa de microservicios con Kubernetes
+
+**Seguridad:**
+- JWT con refresh tokens + 2FA obligatorio (TOTP)
+- RBAC con permisos granulares
+- TLS 1.3 para todas las comunicaciones
+- Cumplimiento con RGPD
+- Secrets management con vault
+
+---

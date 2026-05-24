@@ -1232,11 +1232,382 @@ flowchart TB
 
 ---
 
+## Arquitectura del Sistema a Alto Nivel
+
+### Visión General
+
+La arquitectura del sistema LTI sigue un patrón de **arquitectura modular con dominios separados**, que ofrece un balance ideal entre simplicidad para el MVP y capacidad de escalar hacia microservicios en el futuro. Esta arquitectura permite desarrollo rápido, mantenimiento manejable y evolución gradual hacia una arquitectura más compleja según las necesidades del negocio.
+
+### Stack Tecnológico Recomendado
+
+#### Frontend
+- **Framework**: Next.js 14+ (React con SSR/SSG)
+- **Lenguaje**: TypeScript
+- **UI Components**: shadcn/ui + TailwindCSS
+- **State Management**: Zustand o React Context API
+- **Form Handling**: React Hook Form + Zod
+- **HTTP Client**: Axios o fetch nativo
+- **Build Tool**: Turbopack (Next.js nativo)
+
+#### Backend
+- **Framework**: NestJS (Node.js con TypeScript)
+- **Arquitectura**: Modular con dominios separados
+- **API**: REST + GraphQL (opcional para consultas complejas)
+- **Validación**: class-validator + class-transformer
+- **Documentación**: Swagger/OpenAPI
+- **Autenticación**: JWT + Passport.js
+
+#### Base de Datos
+- **Principal**: PostgreSQL 15+ (relacional, robusta)
+- **Cache/Sesiones**: Redis 7+ (alto rendimiento)
+- **ORM**: Prisma (type-safe, migrations automáticas)
+
+#### Almacenamiento de Archivos
+- **Servicio**: AWS S3 o DigitalOcean Spaces (S3-compatible)
+- **CDN**: Cloudflare (para distribución global)
+- **Antivirus**: ClamAV (escaneo en tiempo real)
+
+#### Mensajería y Colas
+- **Message Broker**: Redis + BullMQ (simple, eficiente)
+- **Event Bus**: Redis Pub/Sub (notificaciones en tiempo real)
+
+#### Infraestructura y DevOps
+- **Contenedores**: Docker
+- **Orquestación**: Docker Compose (MVP) → Kubernetes (producción)
+- **CI/CD**: GitHub Actions
+- **Monitoring**: Prometheus + Grafana
+- **Logging**: Winston + ELK Stack (Elasticsearch, Logstash, Kibana)
+- **Tracing**: OpenTelemetry + Jaeger
+
+#### Servicios Externos
+- **Email**: SendGrid o AWS SES
+- **Autenticación 2FA**: TOTP (speakeasy)
+- **Videoconferencia**: Zoom API o Google Meet
+- **Redes Sociales**: LinkedIn API, Twitter/X API
+- **Analytics**: Mixpanel o Amplitude
+
+### Diagrama de Arquitectura de Alto Nivel
+
+```mermaid
+flowchart TB
+    subgraph "Client Layer - Capa de Cliente"
+        WebApp[Web Application<br/>Next.js + TypeScript]
+        MobileApp[Mobile App<br/>React Native<br/>Futuro]
+    end
+
+    subgraph "CDN & Security - CDN y Seguridad"
+        CDN[Cloudflare CDN<br/>HTTPS, DDoS Protection]
+        WAF[Web Application Firewall]
+    end
+
+    subgraph "API Gateway - Puerta de Entrada"
+        Gateway[API Gateway<br/>Kong / AWS API Gateway]
+        RateLimiter[Rate Limiter]
+        AuthMiddleware[Auth Middleware<br/>JWT Validation]
+    end
+
+    subgraph "Application Layer - Capa de Aplicación"
+        subgraph "Core Services - Servicios Core"
+            AuthService[Auth Service<br/>Authentication & Authorization]
+            UserService[User Service<br/>User Management]
+            CandidateService[Candidate Service<br/>Candidate Profiles]
+            JobService[Job Service<br/>Job Offers Management]
+            ApplicationService[Application Service<br/>Applications Pipeline]
+            EvaluationService[Evaluation Service<br/>Tests & Assessments]
+            InterviewService[Interview Service<br/>Interview Scheduling]
+            NotificationService[Notification Service<br/>Email, Push, SMS]
+        end
+
+        subgraph "Support Services - Servicios de Soporte"
+            FileService[File Service<br/>Document Management]
+            SearchService[Search Service<br/>Elasticsearch]
+            AnalyticsService[Analytics Service<br/>Metrics & Reports]
+            AuditService[Audit Service<br/>Logging & Compliance]
+        end
+    end
+
+    subgraph "Message Queue - Cola de Mensajes"
+        Queue[BullMQ Queue<br/>Redis-based]
+    end
+
+    subgraph "Data Layer - Capa de Datos"
+        PostgreSQL[(PostgreSQL<br/>Primary Database)]
+        Redis[(Redis<br/>Cache & Sessions)]
+        Elasticsearch[(Elasticsearch<br/>Full-text Search)]
+    end
+
+    subgraph "Storage Layer - Capa de Almacenamiento"
+        S3[S3 Storage<br/>CVs, Documents, Images]
+        CDNStorage[CDN Storage<br/>Static Assets]
+    end
+
+    subgraph "External Services - Servicios Externos"
+        EmailProvider[Email Provider<br/>SendGrid/AWS SES]
+        SocialAPIs[Social APIs<br/>LinkedIn, Twitter, Facebook]
+        VideoAPI[Video Conference<br/>Zoom/Google Meet]
+        Antivirus[Antivirus<br/>ClamAV]
+    end
+
+    subgraph "Monitoring & Logging - Monitoreo y Logging"
+        Prometheus[Prometheus<br/>Metrics Collection]
+        Grafana[Grafana<br/>Dashboards]
+        ELK[ELK Stack<br/>Logging]
+        Jaeger[Jaeger<br/>Distributed Tracing]
+    end
+
+    WebApp -->|HTTPS| CDN
+    MobileApp -->|HTTPS| CDN
+    CDN --> WAF
+    WAF --> Gateway
+    Gateway --> RateLimiter
+    RateLimiter --> AuthMiddleware
+
+    AuthMiddleware --> AuthService
+    AuthMiddleware --> UserService
+    AuthMiddleware --> CandidateService
+    AuthMiddleware --> JobService
+    AuthMiddleware --> ApplicationService
+    AuthMiddleware --> EvaluationService
+    AuthMiddleware --> InterviewService
+    AuthMiddleware --> NotificationService
+
+    AuthService --> PostgreSQL
+    UserService --> PostgreSQL
+    CandidateService --> PostgreSQL
+    JobService --> PostgreSQL
+    ApplicationService --> PostgreSQL
+    EvaluationService --> PostgreSQL
+    InterviewService --> PostgreSQL
+
+    UserService --> Redis
+    AuthService --> Redis
+    ApplicationService --> Redis
+
+    SearchService --> Elasticsearch
+    FileService --> S3
+    FileService --> Antivirus
+
+    NotificationService --> Queue
+    Queue --> EmailProvider
+    Queue --> SocialAPIs
+    Queue --> VideoAPI
+
+    AnalyticsService --> PostgreSQL
+    AuditService --> PostgreSQL
+
+    WebApp --> CDNStorage
+
+    AuthService --> Prometheus
+    UserService --> Prometheus
+    CandidateService --> Prometheus
+    JobService --> Prometheus
+    ApplicationService --> Prometheus
+    EvaluationService --> Prometheus
+    InterviewService --> Prometheus
+    NotificationService --> Prometheus
+
+    Prometheus --> Grafana
+    AuthService --> ELK
+    UserService --> ELK
+    CandidateService --> ELK
+    JobService --> ELK
+    ApplicationService --> ELK
+    EvaluationService --> ELK
+    InterviewService --> ELK
+    NotificationService --> ELK
+
+    AuthService --> Jaeger
+    UserService --> Jaeger
+    CandidateService --> Jaeger
+    JobService --> Jaeger
+    ApplicationService --> Jaeger
+    EvaluationService --> Jaeger
+    InterviewService --> Jaeger
+    NotificationService --> Jaeger
+
+    style WebApp fill:#e1f5ff
+    style MobileApp fill:#e1f5ff
+    style CDN fill:#fff4e1
+    style WAF fill:#fff4e1
+    style Gateway fill:#fff4e1
+    style RateLimiter fill:#fff4e1
+    style AuthMiddleware fill:#fff4e1
+    style AuthService fill:#d4edda
+    style UserService fill:#d4edda
+    style CandidateService fill:#d4edda
+    style JobService fill:#d4edda
+    style ApplicationService fill:#d4edda
+    style EvaluationService fill:#d4edda
+    style InterviewService fill:#d4edda
+    style NotificationService fill:#d4edda
+    style FileService fill:#d4edda
+    style SearchService fill:#d4edda
+    style AnalyticsService fill:#d4edda
+    style AuditService fill:#d4edda
+    style Queue fill:#ffe4e1
+    style PostgreSQL fill:#f8d7da
+    style Redis fill:#f8d7da
+    style Elasticsearch fill:#f8d7da
+    style S3 fill:#f8d7da
+    style CDNStorage fill:#f8d7da
+    style EmailProvider fill:#ffe4e1
+    style SocialAPIs fill:#ffe4e1
+    style VideoAPI fill:#ffe4e1
+    style Antivirus fill:#ffe4e1
+    style Prometheus fill:#e8f5e9
+    style Grafana fill:#e8f5e9
+    style ELK fill:#e8f5e9
+    style Jaeger fill:#e8f5e9
+```
+
+### Descripción de Componentes
+
+#### Capa de Cliente (Client Layer)
+- **Web Application**: Aplicación web principal construida con Next.js, accesible desde cualquier navegador moderno
+- **Mobile App**: Aplicación móvil futura para reclutadores que necesitan gestionar procesos fuera de la oficina
+
+#### CDN y Seguridad
+- **Cloudflare CDN**: Distribución global de contenido estático, protección DDoS, aceleración de contenido
+- **Web Application Firewall**: Protección contra ataques comunes (SQL injection, XSS, CSRF)
+
+#### API Gateway
+- **API Gateway**: Punto de entrada único para todas las solicitudes API, routing, load balancing
+- **Rate Limiter**: Limitación de tasa para prevenir abuso y ataques de fuerza bruta
+- **Auth Middleware**: Validación de tokens JWT, autorización basada en roles
+
+#### Servicios Core (Core Services)
+- **Auth Service**: Gestión de autenticación, autorización, 2FA, recuperación de contraseñas
+- **User Service**: Gestión de usuarios, perfiles, roles, permisos
+- **Candidate Service**: Gestión de perfiles de candidatos, experiencia, educación, habilidades
+- **Job Service**: Gestión de ofertas de empleo, publicación, aprobación, estados
+- **Application Service**: Gestión del pipeline de candidaturas, cambios de estado, auditoría
+- **Evaluation Service**: Gestión de pruebas técnicas, tests de habilidades, cuestionarios
+- **Interview Service**: Programación de entrevistas, gestión de calendarios, feedback
+- **Notification Service**: Envío de notificaciones por email, push, SMS, in-app
+
+#### Servicios de Soporte (Support Services)
+- **File Service**: Gestión de carga, almacenamiento y recuperación de documentos (CVs, cartas)
+- **Search Service**: Búsqueda avanzada de candidatos y ofertas con Elasticsearch
+- **Analytics Service**: Generación de métricas, reportes, dashboards de KPIs
+- **Audit Service**: Registro de auditoría, compliance, logging de eventos
+
+#### Cola de Mensajes
+- **BullMQ Queue**: Sistema de colas basado en Redis para procesamiento asíncrono de tareas (envío de emails, notificaciones, procesamiento de documentos)
+
+#### Capa de Datos
+- **PostgreSQL**: Base de datos relacional principal para datos transaccionales
+- **Redis**: Cache de sesiones, cache de consultas frecuentes, rate limiting
+- **Elasticsearch**: Motor de búsqueda para búsqueda full-text de candidatos y ofertas
+
+#### Capa de Almacenamiento
+- **S3 Storage**: Almacenamiento de objetos para CVs, documentos, imágenes
+- **CDN Storage**: Almacenamiento de assets estáticos (CSS, JS, imágenes)
+
+#### Servicios Externos
+- **Email Provider**: Servicio de envío de emails transaccionales y marketing
+- **Social APIs**: Integraciones con redes sociales para publicación de ofertas
+- **Video Conference**: Integración con plataformas de videoconferencia para entrevistas
+- **Antivirus**: Servicio de escaneo de documentos cargados
+
+#### Monitoreo y Logging
+- **Prometheus**: Recolección de métricas de todos los servicios
+- **Grafana**: Visualización de métricas en dashboards en tiempo real
+- **ELK Stack**: Centralización y análisis de logs
+- **Jaeger**: Distributed tracing para seguimiento de requests a través de servicios
+
+### Flujo de Datos Típico
+
+#### Flujo de Postulación de Candidato
+1. El candidato accede a la web application a través de Cloudflare CDN
+2. El API Gateway valida el rate limit y autenticación
+3. El Candidate Service gestiona el perfil y documentos
+4. El File Service carga el CV a S3 y lo escanea con antivirus
+5. La Application Service crea la candidatura en PostgreSQL
+6. El Notification Service envía confirmación por email (asíncrono vía BullMQ)
+7. El Audit Service registra el evento para compliance
+
+#### Flujo de Gestión de Pipeline
+1. El reclutador accede al dashboard de candidaturas
+2. El Application Service consulta PostgreSQL y Redis (cache)
+3. El reclutador mueve el candidato al siguiente estado
+4. El Audit Service registra el cambio con timestamp y usuario
+5. El Notification Service envía notificación al candidato (asíncrono)
+6. Si hay prueba técnica, el Evaluation Service la asigna
+7. Prometheus registra métricas de rendimiento
+
+### Estrategia de Escalabilidad
+
+#### Escalabilidad Horizontal
+- Los servicios pueden escalar horizontalmente mediante Kubernetes
+- PostgreSQL puede escalar con read replicas
+- Redis puede configurarse en cluster mode
+- Elasticsearch puede escalar con múltiples nodos
+
+#### Escalabilidad Vertical
+- Los servicios pueden escalar verticalmente aumentando recursos
+- PostgreSQL puede aumentar CPU/RAM según carga
+- S3 ofrece almacenamiento ilimitado
+
+#### Estrategia de Evolución
+- **Fase 1 (MVP)**: Monolito modular con Docker Compose
+- **Fase 2 (Growth)**: Separar servicios críticos (Auth, Notification) como microservicios
+- **Fase 3 (Scale)**: Arquitectura completa de microservicios con Kubernetes
+
+### Consideraciones de Seguridad
+
+- **Autenticación**: JWT con refresh tokens, 2FA obligatorio (TOTP)
+- **Autorización**: RBAC (Role-Based Access Control) con permisos granulares
+- **Encriptación**: TLS 1.3 para todas las comunicaciones, encriptación at-rest en S3
+- **Validación**: Validación de inputs en todos los niveles (frontend, API, base de datos)
+- **Rate Limiting**: Protección contra abuso en todos los endpoints
+- **Auditoría**: Registro completo de todos los eventos sensibles
+- **Compliance**: Cumplimiento con RGPD, encriptación de datos personales
+- **Secrets Management**: Uso de vault para gestión de secrets (AWS Secrets Manager, HashiCorp Vault)
+
+### Estrategia de Despliegue
+
+#### Entorno de Desarrollo
+- Docker Compose para orquestación local
+- Hot reload para desarrollo rápido
+- Base de datos local PostgreSQL + Redis
+
+#### Entorno de Staging
+- Kubernetes cluster en cloud provider
+- Base de datos managed (AWS RDS, Google Cloud SQL)
+- Integración continua con GitHub Actions
+
+#### Entorno de Producción
+- Kubernetes cluster multi-az para alta disponibilidad
+- Base de datos managed con backup automático
+- CDN global para distribución de contenido
+- Auto-scaling basado en métricas de Prometheus
+- Blue-green deployments para zero-downtime
+
+### Tecnologías Alternativas Consideradas
+
+#### Backend Alternativo
+- **Python + FastAPI**: Excelente para IA/ML, pero ecosistema JavaScript más maduro para web
+- **Java + Spring Boot**: Robusto para enterprise, pero mayor complejidad y tiempo de desarrollo
+- **Go + Gin**: Alto rendimiento, pero menor ecosistema de librerías
+
+#### Base de Datos Alternativa
+- **MongoDB**: Flexible para datos no estructurados, pero PostgreSQL mejor para relaciones complejas
+- **MySQL**: Popular, pero PostgreSQL ofrece más features avanzadas
+
+#### Frontend Alternativo
+- **Vue.js + Nuxt**: Curva de aprendizaje suave, pero React más popular y mayor ecosistema
+- **Angular**: Enterprise-ready, pero más complejo y curva de aprendizaje más pronunciada
+
+---
+
 ## Estado del Proyecto
- 
+
 - **Especificación funcional**: Completada
 - **Análisis de beneficios**: Completado
-- **Diseño de diagrama de flujo**: En progreso
+- **Diseño de diagrama de flujo**: Completado
+- **Modelo de datos**: Completado
+- **Arquitectura de alto nivel**: Completada
+- **Diagrama C4**: Completado
 - **Desarrollo**: Pendiente
 
 ---
