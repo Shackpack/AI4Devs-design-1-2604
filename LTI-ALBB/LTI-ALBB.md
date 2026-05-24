@@ -80,7 +80,39 @@ Sistema de reclutamiento de talento que permite anunciar puestos de trabajo, pub
 6. **Entrevistas**: Se programan y realizan entrevistas con los candidatos que pasan las pruebas
 7. **Oferta de empleo**: Se envía oferta al candidato seleccionado
 8. **Contratación**: Se formaliza la contratación y se inicia el proceso de onboarding
- 
+
+```mermaid
+flowchart TD
+    A[Publicación de oferta] --> B[Difusión multi-canal]
+    B --> C[Postulación]
+    C --> D[Revisión inicial]
+    D --> E{¿Candidato preseleccionado?}
+    E -->|Sí| F[Pruebas técnicas]
+    E -->|No| G[Rechazo]
+    F --> H{¿Aprueba pruebas?}
+    H -->|Sí| I[Entrevistas]
+    H -->|No| G
+    I --> J{¿Entrevista exitosa?}
+    J -->|Sí| K[Oferta de empleo]
+    J -->|No| G
+    K --> L{¿Acepta oferta?}
+    L -->|Sí| M[Contratación]
+    L -->|No| N[Oferta rechazada]
+    M --> O[Onboarding]
+
+    style A fill:#e1f5ff
+    style B fill:#e1f5ff
+    style C fill:#fff4e1
+    style D fill:#e1f5ff
+    style F fill:#e1f5ff
+    style I fill:#e1f5ff
+    style K fill:#e1f5ff
+    style M fill:#d4edda
+    style O fill:#d4edda
+    style G fill:#f8d7da
+    style N fill:#f8d7da
+```
+
 ---
  
 ## Estado del Proyecto
@@ -242,34 +274,16 @@ Sistema de reclutamiento de talento que permite anunciar puestos de trabajo, pub
 
 ---
 
-## Diagrama Lean Canvas (Mermaid)
+## Diagrama Lean Canvas (Tabla)
 
-```mermaid
-graph TB
-    subgraph Lean_Canvas["Lean Canvas - LTI"]
-        subgraph Top_Row["Fila Superior"]
-            P[Problema<br/>• Procesos manuales lentos<br/>• Falta de centralización<br/>• Tiempos excesivos<br/>• Sin métricas<br/>• Comunicación fragmentada<br/>• Sesgos en selección]
-            S[Segmentos de Clientes<br/>• Empresas 50-5000 empleados<br/>• RRHH y Talent Acquisition<br/>• Startups en crecimiento<br/>• Agencias de reclutamiento]
-            PV[Propuesta de Valor<br/>• Reduce tiempo 50%<br/>• Centralización total<br/>• Analytics en tiempo real<br/>• IA para matching<br/>• Colaboración real-time]
-        end
+| **Problema** | **Segmentos de Clientes** | **Propuesta de Valor Única** |
+|--------------|---------------------------|------------------------------|
+| • Procesos manuales lentos<br/>• Falta de centralización<br/>• Tiempos excesivos<br/>• Sin métricas<br/>• Comunicación fragmentada<br/>• Sesgos en selección<br/>• Falta transparencia candidatos<br/>• Procesos complejos postulación | • Empresas 50-5000 empleados<br/>• RRHH y Talent Acquisition<br/>• Startups en crecimiento<br/>• Agencias de reclutamiento<br/>• Pequeñas empresas 10-50<br/>• Consultoras RRHH<br/>• Reclutadores<br/>• Hiring Managers<br/>• Candidatos | • Reduce tiempo 50%<br/>• Centralización total<br/>• Analytics en tiempo real<br/>• IA para matching<br/>• Colaboración real-time<br/>• Experiencia transparente<br/>• Seguimiento real-time<br/>• Perfil reutilizable |
 
-        subgraph Middle_Row["Fila Media"]
-            SOL[Solución<br/>• Gestión ciclo completo<br/>• Pipeline Kanban<br/>• Evaluaciones técnicas<br/>• Programación entrevistas<br/>• Publicación multi-canal<br/>• Notificaciones<br/>• Analytics avanzados<br/>• IA preselección<br/>• Onboarding digital]
-            CAN[Canales<br/>• Marketing digital<br/>• Content marketing<br/>• Ventas B2B<br/>• Partnerships<br/>• Eventos HR Tech<br/>• Free trial]
-        end
+| **Solución** | **Canales** | **Flujos de Ingresos** |
+|---------------|-------------|------------------------|
+| • Gestión ciclo completo<br/>• Pipeline Kanban<br/>• Evaluaciones técnicas<br/>• Programación entrevistas<br/>• Publicación multi-canal<br/>• Notificaciones<br/>• Analytics avanzados<br/>• IA preselección<br/>• Onboarding digital | • Marketing digital<br/>• Content marketing<br/>• Ventas B2B<br/>• Partnerships<br/>• Eventos HR Tech<br/>• Free trial<br/>• SaaS web<br/>• Demo personalizadas<br/>• Integraciones | • Starter: $299/mes<br/>• Professional: $699/mes<br/>• Enterprise: $1,499+/mes<br/>• Integraciones premium<br/>• Evaluaciones técnicas<br/>• Implementación<br/>• Training |
 
-        subgraph Bottom_Row["Fila Inferior"]
-            FI[Flujos de Ingresos<br/>• Starter: $299/mes<br/>• Professional: $699/mes<br/>• Enterprise: $1,499+/mes<br/>• Integraciones premium<br/>• Evaluaciones técnicas<br/>• Implementación<br/>• Training]
-            EC[Estructura de Costos<br/>• Desarrollo: $15-25K/mes<br/>• Infraestructura: $3-8K/mes<br/>• Salarios equipo<br/>• Oficina: $5-10K/mes<br/>• Marketing por cliente<br/>• Comisiones ventas]
-            MC[Métricas Clave<br/>• CAC, MRR/ARR<br/>• Conversión trial<br/>• Churn rate<br/>• DAU/MAU<br/>• Tiempo contratación<br/>• NPS, CSAT]
-            VI[Ventaja Injusta<br/>• IA propietaria<br/>• Experiencia equipo<br/>• Integraciones nativas<br/>• UX superior<br/>• First-mover<br/>• Comunidad activa<br/>• Data exclusiva]
-        end
-    end
-
-    P --> S
-    S --> PV
-    SOL --> CAN
-    FI --> EC
-    EC --> MC
-    MC --> VI
-```
+| **Estructura de Costos** | **Métricas Clave** | **Ventaja Injusta** |
+|---------------------------|---------------------|---------------------|
+| • Desarrollo: $15-25K/mes<br/>• Infraestructura: $3-8K/mes<br/>• Salarios equipo<br/>• Oficina: $5-10K/mes<br/>• Marketing por cliente<br/>• Comisiones ventas | • CAC<br/>• MRR/ARR<br/>• Conversión trial<br/>• Churn rate<br/>• DAU/MAU<br/>• Tiempo contratación<br/>• NPS<br/>• CSAT | • IA propietaria<br/>• Experiencia equipo<br/>• Integraciones nativas<br/>• UX superior<br/>• First-mover<br/>• Comunidad activa<br/>• Data exclusiva |
