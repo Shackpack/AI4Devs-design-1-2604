@@ -114,7 +114,429 @@ flowchart TD
 ```
 
 ---
- 
+
+## Casos de Uso Principales
+
+### Caso de Uso 1: Gestión de Ofertas de Empleo
+
+**Descripción:**
+Este caso de uso permite a los reclutadores y RRHH crear, editar, publicar y gestionar ofertas de empleo en el sistema. Incluye la definición de detalles del puesto, requisitos, salario, ubicación y la publicación en múltiples canales.
+
+**Actores:**
+- Reclutador/RRHH
+- Hiring Manager
+
+**Estados Previos Requeridos:**
+- El reclutador debe tener una cuenta activa con permisos de "Gestión de Ofertas"
+- El reclutador debe haber completado la autenticación de doble factor (2FA)
+- La empresa debe tener configurados los canales de publicación
+
+**Flujo Principal:**
+1. El reclutador accede al módulo de gestión de ofertas
+2. Crea una nueva oferta de empleo
+3. Completa los campos requeridos (título, descripción, requisitos, salario, ubicación)
+4. Define el estado de la oferta (borrador, activa, pausada, cerrada)
+5. Selecciona los canales de publicación (redes sociales, portales de empleo)
+6. Solicita aprobación del Hiring Manager
+7. El Manager aprueba la oferta
+8. Publica la oferta
+9. La oferta se distribuye en los canales seleccionados
+10. El reclutador puede editar o desactivar la oferta en cualquier momento
+
+**Flujos Alternativos:**
+- **Flujo Alternativo 1: Rechazo de aprobación**
+  - Si el Manager rechaza la oferta, el reclutador recibe notificación con feedback
+  - El reclutador puede modificar la oferta y solicitar aprobación nuevamente
+
+- **Flujo Alternativo 2: Edición de oferta publicada**
+  - Si el reclutador edita una oferta ya publicada, debe solicitar aprobación nuevamente
+  - Los cambios no se aplican hasta la aprobación del Manager
+
+- **Flujo Alternativo 3: Error en publicación de canales**
+  - Si falla la publicación en algún canal, el sistema notifica al reclutador
+  - La oferta permanece publicada en los canales exitosos
+  - El reclutador puede reintentar la publicación en el canal fallido
+
+**Manejo de Errores y Excepciones:**
+- **Error de validación de campos**: Si algún campo tiene formato inválido, el sistema muestra error específico y no permite guardar
+- **Error de conexión con canales externos**: Si falla la conexión con redes sociales/portales, se guarda la oferta en estado "Pendiente de publicación" y se reintentará automáticamente
+- **Error de autenticación 2FA**: Si falla la autenticación, se solicita nuevamente después de 3 intentos fallidos se bloquea temporalmente la cuenta
+- **Error de aprobación pendiente**: Si el Manager no responde en 48 horas, se envía recordatorio automático
+
+**Casos Borde:**
+- Crear oferta con campos extremadamente largos (límite de caracteres)
+- Publicar oferta con salario en formato no estándar
+- Editar oferta mientras tiene candidaturas activas
+- Desactivar oferta con candidatos en proceso de selección
+- Publicar oferta en canales que no están configurados
+
+**Criterios de Aceptación:**
+- Todos los campos obligatorios deben estar completos antes de publicarse
+- Validación de formato para email (formato estándar RFC 5322)
+- Validación de formato para teléfono (números internacionales con código de país)
+- Validación de formato para salario (numérico, moneda, periodicidad)
+- Requiere aprobación obligatoria del Hiring Manager antes de publicarse
+- Sin límite de ofertas activas simultáneas
+- Cumplimiento con RGPD: datos sensibles de candidatos no visibles en oferta pública
+
+**Validaciones y Reglas de Negocio:**
+- **Validaciones de datos**:
+  - Título: 5-100 caracteres, sin caracteres especiales peligrosos
+  - Descripción: 50-5000 caracteres, sanitización de HTML
+  - Email: formato válido, verificación de dominio
+  - Teléfono: formato internacional + código país
+  - Salario: numérico positivo, rango válido según mercado
+  - Ubicación: validación de código postal/país
+
+- **Reglas de negocio**:
+  - Una oferta no puede ser publicada sin aprobación del Manager
+  - Las ofertas con candidaturas activas no pueden ser eliminadas, solo desactivadas
+  - Los cambios en ofertas publicadas requieren aprobación nuevamente
+  - El reclutador debe tener permisos específicos para gestionar ofertas
+  - Se debe cumplir con RGPD: no incluir información personal en ofertas públicas
+
+```mermaid
+flowchart TD
+    A[Reclutador con cuenta activa y 2FA] --> B[Acceder a gestión de ofertas]
+    B --> C[Crear nueva oferta]
+    C --> D[Completar campos requeridos]
+    D --> E{¿Validación campos OK?}
+    E -->|No| D
+    E -->|Sí| F[Definir estado de oferta]
+    F --> G[Seleccionar canales de publicación]
+    G --> H[Solicitar aprobación Manager]
+    H --> I{¿Aprobado?}
+    I -->|No| J[Recibir feedback y modificar]
+    J --> H
+    I -->|Sí| K[Publicar oferta]
+    K --> L{¿Publicación exitosa?}
+    L -->|No| M[Guardar como pendiente y reintentar]
+    M --> K
+    L -->|Sí| N[Distribuir en canales seleccionados]
+    N --> O{¿Editar/Desactivar?}
+    O -->|Sí| P[Modificar oferta]
+    P --> H
+    O -->|No| Q[Oferta activa]
+
+    style A fill:#e1f5ff
+    style B fill:#e1f5ff
+    style C fill:#e1f5ff
+    style D fill:#e1f5ff
+    style F fill:#e1f5ff
+    style G fill:#e1f5ff
+    style K fill:#d4edda
+    style N fill:#d4edda
+    style Q fill:#d4edda
+    style J fill:#fff4e1
+    style M fill:#fff4e1
+    style P fill:#fff4e1
+```
+
+---
+
+### Caso de Uso 2: Postulación de Candidatos
+
+**Descripción:**
+Este caso de uso permite a los candidatos registrarse en el sistema, completar su perfil, cargar documentos y postularse a ofertas de empleo disponibles. Incluye el seguimiento del estado de su candidatura en tiempo real.
+
+**Actores:**
+- Candidato
+
+**Estados Previos Requeridos:**
+- El candidato debe tener una cuenta activa
+- El candidato debe haber completado la autenticación de doble factor (2FA)
+- El perfil del candidato debe estar 100% completo
+- La oferta de empleo debe estar en estado "Activa"
+
+**Flujo Principal:**
+1. El candidato descubre una oferta de empleo
+2. Accede al sistema de postulación
+3. Se registra o inicia sesión con 2FA
+4. Completa su perfil al 100% (información personal, experiencia, educación, habilidades)
+5. Carga documentos requeridos (CV, carta de presentación)
+6. El sistema escanea los documentos con antivirus
+7. Si los documentos están limpios, continúa
+8. Selecciona la oferta a la que desea postularse
+9. Verifica que cumple con criterios opcionales de la oferta (si existen)
+10. El sistema verifica que no haya postulación duplicada
+11. Envía su postulación
+12. Recibe confirmación de recepción
+13. Puede seguir el estado de su candidatura en tiempo real
+
+**Flujos Alternativos:**
+- **Flujo Alternativo 1: Perfil incompleto**
+  - Si el perfil no está 100% completo, el sistema bloquea la postulación
+  - Muestra campos faltantes y no permite continuar hasta completarlos
+
+- **Flujo Alternativo 2: Documento con virus detectado**
+  - Si el antivirus detecta malware, el documento es rechazado
+  - El candidato recibe notificación del problema
+  - Debe cargar un documento limpio para continuar
+
+- **Flujo Alternativo 3: Postulación duplicada**
+  - Si el candidato ya se postuló a esta oferta, el sistema lo notifica
+  - No permite crear una nueva postulación duplicada
+  - El candidato puede ver su postulación existente
+
+- **Flujo Alternativo 4: No cumple criterios opcionales**
+  - Si la oferta tiene criterios opcionales y el candidato no los cumple
+  - El sistema muestra advertencia pero permite postularse
+  - El reclutador verá que no cumple los criterios opcionales
+
+**Manejo de Errores y Excepciones:**
+- **Error de validación de perfil**: Si el perfil no está 100% completo, el sistema muestra campos faltantes y bloquea postulación
+- **Error de tamaño de documento**: Si el documento excede 10MB, el sistema rechaza la carga y muestra mensaje específico
+- **Error de formato de archivo**: Si el archivo no es formato permitido (PDF, Word), el sistema rechaza la carga
+- **Error de antivirus**: Si el antivirus detecta amenaza, el documento es eliminado y se notifica al candidato
+- **Error de autenticación 2FA**: Si falla la autenticación, se solicita nuevamente, después de 3 intentos fallidos se bloquea temporalmente
+- **Error de conexión**: Si falla la carga de documentos, se permite reintentar sin perder datos del formulario
+
+**Casos Borde:**
+- Cargar documento exactamente de 10MB (límite máximo)
+- Intentar postularse a oferta inactiva o cerrada
+- Postularse con múltiples documentos simultáneamente
+- Intentar postularse sin completar campos opcionales del perfil
+- Cargar documento con nombre de archivo extremadamente largo
+- Postularse inmediatamente después de registrarse (primer uso)
+
+**Criterios de Aceptación:**
+- El perfil debe estar 100% completo para poder postularse
+- Límite de 10MB por documento
+- Validación de formato de archivos: solo PDF (.pdf), Word (.doc, .docx)
+- Revisión por antivirus de todos los documentos cargados
+- Sin límite de postulaciones por candidato
+- No puede haber postulaciones duplicadas a la misma oferta
+- Cumplimiento con RGPD: consentimiento explícito para tratamiento de datos
+- Autenticación 2FA obligatoria para acceder al sistema
+
+**Validaciones y Reglas de Negocio:**
+- **Validaciones de datos**:
+  - Nombre: 2-50 caracteres, solo letras y espacios
+  - Email: formato válido RFC 5322, verificación de dominio
+  - Teléfono: formato internacional + código país
+  - CV: máximo 10MB, formatos PDF/Word
+  - Carta de presentación: máximo 10MB, formatos PDF/Word
+  - Experiencia: validación de fechas (no futuras)
+  - Educación: validación de instituciones y títulos
+
+- **Reglas de negocio**:
+  - No puede haber postulaciones duplicadas a la misma oferta
+  - Se pueden establecer criterios opcionales para postular (configuración del reclutador)
+  - El perfil debe estar 100% completo para postular
+  - Todos los documentos pasan por escaneo antivirus
+  - Cumplimiento con RGPD: consentimiento explícito, derecho al olvido, portabilidad de datos
+  - Autenticación 2FA obligatoria para todas las acciones
+  - Los datos del candidato se almacenan encriptados
+
+```mermaid
+flowchart TD
+    A[Candidato descubre oferta activa] --> B[Acceder a sistema de postulación]
+    B --> C{¿Tiene cuenta?}
+    C -->|No| D[Registrarse con 2FA]
+    C -->|Sí| E[Iniciar sesión con 2FA]
+    D --> F{¿2FA exitoso?}
+    E --> F
+    F -->|No| G[Reintentar 2FA]
+    G --> F
+    F -->|Sí| H[Completar perfil 100%]
+    H --> I{¿Perfil completo?}
+    I -->|No| H
+    I -->|Sí| J[Cargar documentos]
+    J --> K{¿Tamaño y formato OK?}
+    K -->|No| J
+    K -->|Sí| L[Escaneo antivirus]
+    L --> M{¿Virus detectado?}
+    M -->|Sí| N[Rechazar documento]
+    N --> J
+    M -->|No| O[Seleccionar oferta]
+    O --> P{¿Cumple criterios opcionales?}
+    P -->|No| Q[Advertencia pero continuar]
+    P -->|Sí| R[Continuar]
+    Q --> S[Verificar no duplicado]
+    R --> S
+    S --> T{¿Postulación duplicada?}
+    T -->|Sí| U[Mostrar postulación existente]
+    T -->|No| V[Enviar postulación]
+    V --> W[Confirmación de recepción]
+    W --> X[Seguir estado de candidatura]
+
+    style A fill:#fff4e1
+    style B fill:#fff4e1
+    style D fill:#fff4e1
+    style E fill:#fff4e1
+    style H fill:#fff4e1
+    style J fill:#fff4e1
+    style L fill:#fff4e1
+    style O fill:#fff4e1
+    style V fill:#d4edda
+    style W fill:#d4edda
+    style X fill:#d4edda
+    style G fill:#fff4e1
+    style N fill:#f8d7da
+    style Q fill:#fff4e1
+    style U fill:#fff4e1
+```
+
+---
+
+### Caso de Uso 3: Pipeline de Candidatos
+
+**Descripción:**
+Este caso de uso permite a los reclutadores gestionar el flujo de candidatos a través de las diferentes etapas del proceso de selección. Incluye la revisión inicial, asignación de pruebas técnicas, programación de entrevistas, envío de ofertas y gestión de contrataciones.
+
+**Actores:**
+- Reclutador/RRHH
+- Hiring Manager
+
+**Estados Previos Requeridos:**
+- El reclutador debe tener una cuenta activa con permisos de "Gestión de Pipeline"
+- El reclutador debe haber completado la autenticación de doble factor (2FA)
+- Debe haber candidaturas en estado "Recibido" disponibles para revisión
+- Los límites de tiempo por etapa deben estar configurados (configuración variable por empresa)
+
+**Flujo Principal:**
+1. El reclutador accede al pipeline de candidatos
+2. Visualiza las candidaturas en estado "Recibido"
+3. Realiza revisión inicial de perfiles
+4. Aprueba el avance del candidato (solo requiere aprobación de un reclutador)
+5. Mueve candidatos preseleccionados a "En revisión"
+6. El sistema envía notificación al candidato del cambio de estado
+7. Asigna pruebas técnicas a candidatos cualificados
+8. El candidato completa las pruebas dentro del límite de tiempo configurado
+9. Evalúa resultados de pruebas
+10. Aprueba el avance del candidato
+11. Programa entrevistas con candidatos que pasan las pruebas
+12. El sistema envía notificación al candidato con detalles de entrevista
+13. Realiza entrevistas y registra feedback
+14. Aprueba el avance del candidato
+15. Envía oferta de empleo al candidato seleccionado
+16. El sistema envía notificación al candidato con la oferta
+17. Gestiona aceptación/rechazo de oferta
+18. Mueve a "Contratado" o "Rechazado" según corresponda
+19. El sistema envía notificación final al candidato
+
+**Flujos Alternativos:**
+- **Flujo Alternativo 1: Candidato no completa pruebas en tiempo**
+  - Si el candidato no completa las pruebas dentro del límite de tiempo configurado
+  - El sistema mueve automáticamente al candidato a "Rechazado por tiempo"
+  - Se envía notificación al candidato explicando la situación
+
+- **Flujo Alternativo 2: Rechazo en cualquier etapa**
+  - Si el reclutador rechaza al candidato en cualquier etapa
+  - El candidato se mueve a "Rechazado"
+  - Se envía notificación al candidato con feedback (si está configurado)
+
+- **Flujo Alternativo 3: Candidato rechaza oferta**
+  - Si el candidato rechaza la oferta de empleo
+  - El candidato se mueve a "Oferta rechazada"
+  - Se mantiene en el sistema para futuras oportunidades
+  - Se envía notificación al reclutador
+
+- **Flujo Alternativo 4: Reconsideración de candidato**
+  - Si un candidato fue rechazado pero el reclutador quiere reconsiderarlo
+  - El reclutador puede moverlo de vuelta a una etapa anterior
+  - Se envía notificación al candidato del cambio de estado
+
+**Manejo de Errores y Excepciones:**
+- **Error de límite de tiempo excedido**: Si el candidato excede el tiempo en una etapa, el sistema notifica y puede mover automáticamente a rechazado según configuración
+- **Error de notificación fallida**: Si falla el envío de notificación al candidato, el sistema reintentará automáticamente 3 veces
+- **Error de autenticación 2FA**: Si falla la autenticación, se solicita nuevamente, después de 3 intentos fallidos se bloquea temporalmente
+- **Error de programación de entrevista**: Si falla la integración con calendario externo, se permite programación manual
+- **Error de envío de oferta**: Si falla el envío de la oferta por email, se notifica al reclutador para reintentar manualmente
+- **Error de cambio de estado no permitido**: Si el reclutador intenta mover un candidato a un estado no válido, el sistema muestra error y bloquea la acción
+
+**Casos Borde:**
+- Mover candidato de "Recibido" directamente a "Entrevista" (saltando etapas)
+- Configurar límite de tiempo de 0 horas (sin límite)
+- Tener múltiples candidatos en la misma etapa simultáneamente
+- Rechazar candidato que ya está en "Oferta enviada"
+- Mover candidato de "Rechazado" a "Contratado" (flujo reverso)
+- Programar entrevista para fecha/hora ya pasada
+
+**Criterios de Aceptación:**
+- Límite de tiempo variable y configurable para cada paso del pipeline
+- Solo se requiere una aprobación de reclutador para poder avanzar
+- Notificaciones obligatorias en cada cambio de estado
+- Sin límite de candidatos en las etapas
+- Cumplimiento con RGPD: acceso controlado a datos del candidato
+- Autenticación 2FA obligatoria para cualquier cambio de estado
+- El sistema debe registrar todos los cambios de estado con timestamp y usuario
+
+**Validaciones y Reglas de Negocio:**
+- **Validaciones de datos**:
+  - Feedback de entrevista: texto libre, máximo 2000 caracteres, sanitización de HTML
+  - Calificación de prueba: numérico 0-100, obligatorio para avanzar
+  - Fecha de entrevista: no puede ser en el pasado, máximo 6 meses en el futuro
+  - Salario de oferta: numérico positivo, rango válido según mercado
+  - Notas del reclutador: texto libre, máximo 1000 caracteres
+
+- **Reglas de negocio**:
+  - Los límites de tiempo por etapa son configurables por la empresa
+  - Solo un reclutador necesita aprobar para avanzar (no requiere aprobación múltiple)
+  - Notificaciones automáticas en cada cambio de estado
+  - Sin límite de candidatos por etapa
+  - Los candidatos rechazados pueden ser reconsiderados (movidos a etapas anteriores)
+  - Cumplimiento con RGPD: solo usuarios autorizados pueden ver datos completos del candidato
+  - Autenticación 2FA obligatoria para cualquier acción en el pipeline
+  - Todos los cambios de estado se registran en auditoría con usuario y timestamp
+
+```mermaid
+flowchart TD
+    A[Reclutador con cuenta activa y 2FA] --> B[Acceder a pipeline]
+    B --> C[Visualizar candidaturas recibidas]
+    C --> D[Revisión inicial de perfiles]
+    D --> E{¿Preseleccionado?}
+    E -->|No| F[Rechazar candidato]
+    E -->|Sí| G[Aprobar avance reclutador]
+    G --> H[Mover a En revisión]
+    H --> I[Notificar candidato]
+    I --> J[Asignar pruebas técnicas]
+    J --> K{¿Tiempo límite excedido?}
+    K -->|Sí| L[Rechazar por tiempo]
+    K -->|No| M[Evaluación de resultados]
+    M --> N{¿Aprueba pruebas?}
+    N -->|No| F
+    N -->|Sí| O[Aprobar avance reclutador]
+    O --> P[Programar entrevista]
+    P --> Q[Notificar candidato]
+    Q --> R[Realizar entrevista]
+    R --> S[Registrar feedback]
+    S --> T{¿Entrevista exitosa?}
+    T -->|No| F
+    T -->|Sí| U[Aprobar avance reclutador]
+    U --> V[Enviar oferta de empleo]
+    V --> W[Notificar candidato]
+    W --> X{¿Acepta oferta?}
+    X -->|No| Y[Oferta rechazada]
+    X -->|Sí| Z[Contratar candidato]
+    Z --> AA[Iniciar onboarding]
+    AA --> AB[Notificar candidato]
+
+    style A fill:#e1f5ff
+    style B fill:#e1f5ff
+    style C fill:#e1f5ff
+    style D fill:#e1f5ff
+    style G fill:#e1f5ff
+    style H fill:#e1f5ff
+    style I fill:#fff4e1
+    style J fill:#e1f5ff
+    style O fill:#e1f5ff
+    style P fill:#e1f5ff
+    style Q fill:#fff4e1
+    style R fill:#e1f5ff
+    style U fill:#e1f5ff
+    style V fill:#e1f5ff
+    style W fill:#fff4e1
+    style Z fill:#d4edda
+    style AA fill:#d4edda
+    style AB fill:#d4edda
+    style F fill:#f8d7da
+    style L fill:#f8d7da
+    style Y fill:#f8d7da
+```
+
+---
+
 ## Estado del Proyecto
  
 - **Especificación funcional**: Completada

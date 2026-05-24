@@ -495,3 +495,203 @@ flowchart TD
 ```
 
 ---
+
+# Prompt 6
+
+Describe los 3 casos de uso principales por separado. Con la descripción de cada uno, incluye el diagrama de flujo asociado.
+
+---
+
+## Respuesta
+
+## Casos de Uso Principales
+
+### Caso de Uso 1: Gestión de Ofertas de Empleo
+
+**Descripción:**
+Este caso de uso permite a los reclutadores y RRHH crear, editar, publicar y gestionar ofertas de empleo en el sistema. Incluye la definición de detalles del puesto, requisitos, salario, ubicación y la publicación en múltiples canales.
+
+**Actores:**
+- Reclutador/RRHH
+- Hiring Manager
+
+**Flujo Principal:**
+1. El reclutador accede al módulo de gestión de ofertas
+2. Crea una nueva oferta de empleo
+3. Completa los campos requeridos (título, descripción, requisitos, salario, ubicación)
+4. Define el estado de la oferta (borrador, activa, pausada, cerrada)
+5. Selecciona los canales de publicación (redes sociales, portales de empleo)
+6. Publica la oferta
+7. La oferta se distribuye en los canales seleccionados
+8. El reclutador puede editar o desactivar la oferta en cualquier momento
+
+```mermaid
+flowchart TD
+    A[Reclutador accede a gestión de ofertas] --> B[Crear nueva oferta]
+    B --> C[Completar campos requeridos]
+    C --> D{¿Datos completos?}
+    D -->|No| C
+    D -->|Sí| E[Definir estado de oferta]
+    E --> F[Seleccionar canales de publicación]
+    F --> G[Publicar oferta]
+    G --> H[Distribuir en canales seleccionados]
+    H --> I{¿Editar/Desactivar?}
+    I -->|Sí| J[Modificar oferta]
+    J --> H
+    I -->|No| K[Oferta activa]
+
+    style A fill:#e1f5ff
+    style B fill:#e1f5ff
+    style C fill:#e1f5ff
+    style E fill:#e1f5ff
+    style F fill:#e1f5ff
+    style G fill:#d4edda
+    style H fill:#d4edda
+    style J fill:#fff4e1
+    style K fill:#d4edda
+```
+
+---
+
+### Caso de Uso 2: Postulación de Candidatos
+
+**Descripción:**
+Este caso de uso permite a los candidatos registrarse en el sistema, completar su perfil, cargar documentos y postularse a ofertas de empleo disponibles. Incluye el seguimiento del estado de su candidatura en tiempo real.
+
+**Actores:**
+- Candidato
+
+**Flujo Principal:**
+1. El candidato descubre una oferta de empleo
+2. Accede al sistema de postulación
+3. Se registra o inicia sesión
+4. Completa su perfil (información personal, experiencia, educación, habilidades)
+5. Carga documentos requeridos (CV, carta de presentación)
+6. Selecciona la oferta a la que desea postularse
+7. Envía su postulación
+8. Recibe confirmación de recepción
+9. Puede seguir el estado de su candidatura en tiempo real
+
+```mermaid
+flowchart TD
+    A[Candidato descubre oferta] --> B[Acceder a sistema de postulación]
+    B --> C{¿Tiene cuenta?}
+    C -->|No| D[Registrarse]
+    C -->|Sí| E[Iniciar sesión]
+    D --> F[Completar perfil]
+    E --> F
+    F --> G[Cargar documentos]
+    G --> H{¿Documentos cargados?}
+    H -->|No| G
+    H -->|Sí| I[Seleccionar oferta]
+    I --> J[Enviar postulación]
+    J --> K[Confirmación de recepción]
+    K --> L[Seguir estado de candidatura]
+
+    style A fill:#fff4e1
+    style B fill:#fff4e1
+    style D fill:#fff4e1
+    style E fill:#fff4e1
+    style F fill:#fff4e1
+    style G fill:#fff4e1
+    style I fill:#fff4e1
+    style J fill:#d4edda
+    style K fill:#d4edda
+    style L fill:#d4edda
+```
+
+---
+
+### Caso de Uso 3: Pipeline de Candidatos
+
+**Descripción:**
+Este caso de uso permite a los reclutadores gestionar el flujo de candidatos a través de las diferentes etapas del proceso de selección. Incluye la revisión inicial, asignación de pruebas técnicas, programación de entrevistas, envío de ofertas y gestión de contrataciones.
+
+**Actores:**
+- Reclutador/RRHH
+- Hiring Manager
+
+**Flujo Principal:**
+1. El reclutador accede al pipeline de candidatos
+2. Visualiza las candidaturas en estado "Recibido"
+3. Realiza revisión inicial de perfiles
+4. Mueve candidatos preseleccionados a "En revisión"
+5. Asigna pruebas técnicas a candidatos cualificados
+6. Evalúa resultados de pruebas
+7. Programa entrevistas con candidatos que pasan las pruebas
+8. Realiza entrevistas y registra feedback
+9. Envía oferta de empleo al candidato seleccionado
+10. Gestiona aceptación/rechazo de oferta
+11. Mueve a "Contratado" o "Rechazado" según corresponda
+
+```mermaid
+flowchart TD
+    A[Reclutador accede a pipeline] --> B[Visualizar candidaturas recibidas]
+    B --> C[Revisión inicial de perfiles]
+    C --> D{¿Preseleccionado?}
+    D -->|No| E[Rechazar candidato]
+    D -->|Sí| F[Mover a En revisión]
+    F --> G[Asignar pruebas técnicas]
+    G --> H[Evaluación de resultados]
+    H --> I{¿Aprueba pruebas?}
+    I -->|No| E
+    I -->|Sí| J[Programar entrevista]
+    J --> K[Realizar entrevista]
+    K --> L[Registrar feedback]
+    L --> M{¿Entrevista exitosa?}
+    M -->|No| E
+    M -->|Sí| N[Enviar oferta de empleo]
+    N --> O{¿Acepta oferta?}
+    O -->|No| P[Oferta rechazada]
+    O -->|Sí| Q[Contratar candidato]
+    Q --> R[Iniciar onboarding]
+
+    style A fill:#e1f5ff
+    style B fill:#e1f5ff
+    style C fill:#e1f5ff
+    style F fill:#e1f5ff
+    style G fill:#e1f5ff
+    style J fill:#e1f5ff
+    style K fill:#e1f5ff
+    style N fill:#e1f5ff
+    style Q fill:#d4edda
+    style R fill:#d4edda
+    style E fill:#f8d7da
+    style P fill:#f8d7da
+```
+
+---
+
+# Prompt 7
+
+Ampliar los casos de uso principales con:
+- Flujos alternativos, manejo de errores, excepciones, casos borde
+- Establecer estados previos requeridos
+- Establecer criterios de aceptación para cada caso de uso
+- Incluir validaciones, reglas de negocio y validaciones de datos
+
+Criterios específicos definidos:
+- Caso de uso 1: Todas las validaciones afirmativas, sin límite de ofertas activas
+- Caso de uso 2: Perfil 100% completo, límite 10MB documentos, validación formato, antivirus, sin límite postulaciones
+- Caso de uso 3: Límite tiempo variable/configurable, una aprobación reclutador, notificaciones cada cambio, sin límite candidatos
+- Reglas de negocio: No postulaciones duplicadas, criterios opcionales por reclutador, RGPD, 2FA obligatorio, validaciones campos
+
+---
+
+## Respuesta
+
+[La respuesta completa se ha añadido al documento LTI-ALBB.md con los 3 casos de uso ampliados incluyendo: estados previos requeridos, flujos alternativos, manejo de errores y excepciones, casos borde, criterios de aceptación, validaciones de datos y reglas de negocio según los criterios especificados]
+
+---
+
+# Prompt 8
+
+Actualiza los flowcharts correspondientes a estos tres casos de uso para reflejar los cambios realizados en la ampliación.
+
+---
+
+## Respuesta
+
+[Los diagramas de flujo de los 3 casos de uso han sido actualizados en el documento LTI-ALBB.md para incluir: validaciones de campos, aprobaciones, manejo de errores, 2FA, escaneo antivirus, verificación de duplicados, notificaciones en cada cambio de estado, y límites de tiempo configurables]
+
+---
