@@ -695,3 +695,57 @@ Actualiza los flowcharts correspondientes a estos tres casos de uso para refleja
 [Los diagramas de flujo de los 3 casos de uso han sido actualizados en el documento LTI-ALBB.md para incluir: validaciones de campos, aprobaciones, manejo de errores, 2FA, escaneo antivirus, verificación de duplicados, notificaciones en cada cambio de estado, y límites de tiempo configurables]
 
 ---
+
+# Prompt 9
+
+Proceder a la creación del modelo de datos que cubra entidades, atributos (nombre y tipo) y relaciones del proyecto de sistema de reclutamiento LTI.
+
+---
+
+## Respuesta
+
+[El modelo de datos completo ha sido añadido al documento LTI-ALBB.md incluyendo 15 entidades principales con sus atributos, tipos de datos, restricciones, y un diagrama ER en Mermaid que muestra todas las relaciones entre entidades]
+
+**Entidades incluidas:**
+1. Usuario (autenticación, roles, 2FA)
+2. Empresa (información de la empresa)
+3. OfertaEmpleo (ofertas de trabajo)
+4. Candidato (perfil del candidato)
+5. ExperienciaLaboral (historial laboral)
+6. Educacion (formación académica)
+7. Habilidad (habilidades técnicas y blandas)
+8. Documento (CV, cartas, certificados con escaneo antivirus)
+9. Candidatura (postulaciones a ofertas)
+10. PruebaTecnica (evaluaciones técnicas)
+11. Entrevista (entrevistas programadas)
+12. OfertaContratacion (ofertas de empleo)
+13. Notificacion (sistema de notificaciones)
+14. ConfiguracionEmpresa (configuración personalizada por empresa)
+15. AuditoriaCambioEstado (registro de auditoría)
+
+---
+
+# Prompt 10
+
+Refactorizar el modelo de datos: la tabla Candidato necesita una tabla auxiliar para reflejar los recursos externos (linkedin_url, github_url, portafolio_url). Estas entidades externas pueden cambiar en el futuro y tendríamos que replantear la tabla de Candidato. Se permitirá un único recurso de cada tipo para cada candidato. Necesitaremos también una tabla de tipos de recurso para poderlas asociar.
+
+---
+
+## Respuesta
+
+[El modelo de datos ha sido refactorizado para incluir dos nuevas tablas que gestionan los recursos externos de los candidatos de forma escalable]
+
+**Cambios realizados:**
+1. Eliminados los campos linkedin_url, github_url y portafolio_url de la tabla Candidato
+2. Creada tabla TipoRecurso con tipos predefinidos (LINKEDIN, GITHUB, PORTAFOLIO, BEHANCE, DRIBBBLE, STACKOVERFLOW, PERSONAL_BLOG, OTRO)
+3. Creada tabla RecursoExterno con índice único (candidato_id, tipo_recurso_id) para permitir un solo recurso de cada tipo por candidato
+4. Actualizado el diagrama ER con las nuevas relaciones
+5. Renumeradas las entidades restantes (ahora son 17 entidades en total)
+
+**Ventajas de la refactorización:**
+- Escalabilidad: fácil agregar nuevos tipos de recursos sin modificar la tabla Candidato
+- Flexibilidad: los tipos de recursos son configurables y pueden activarse/desactivarse
+- Integridad: índice único garantiza un solo recurso de cada tipo por candidato
+- Mantenibilidad: cambios en recursos externos no afectan la estructura principal del candidato
+
+---

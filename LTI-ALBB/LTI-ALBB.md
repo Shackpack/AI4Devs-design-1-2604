@@ -537,6 +537,556 @@ flowchart TD
 
 ---
 
+## Modelo de Datos
+
+### Entidades Principales
+
+#### 1. Usuario
+Representa a todos los usuarios del sistema (reclutadores, hiring managers, candidatos).
+
+| Atributo | Tipo | Descripción | Restricciones |
+|----------|------|-------------|---------------|
+| id | UUID | Identificador único del usuario | PK, Not Null |
+| email | VARCHAR(255) | Email del usuario | Unique, Not Null, RFC 5322 |
+| password_hash | VARCHAR(255) | Hash de la contraseña | Not Null, Encriptado |
+| nombre | VARCHAR(50) | Nombre del usuario | Not Null, Solo letras |
+| apellido | VARCHAR(50) | Apellido del usuario | Not Null, Solo letras |
+| telefono | VARCHAR(20) | Teléfono con código país | Formato internacional |
+| rol | ENUM | Rol del usuario (RECLUTADOR, MANAGER, CANDIDATO) | Not Null |
+| estado_cuenta | ENUM | Estado de la cuenta (ACTIVA, BLOQUEADA, PENDIENTE) | Not Null |
+| fecha_registro | TIMESTAMP | Fecha y hora de registro | Not Null, Default NOW() |
+| ultimo_acceso | TIMESTAMP | Último acceso al sistema | Nullable |
+| mfa_enabled | BOOLEAN | Autenticación de doble factor activada | Not Null, Default TRUE |
+| mfa_secret | VARCHAR(255) | Secreto para 2FA | Encriptado, Nullable |
+| intentos_fallidos | INTEGER | Contador de intentos fallidos de login | Default 0 |
+| empresa_id | UUID | ID de la empresa (para reclutadores) | FK, Nullable |
+
+#### 2. Empresa
+Representa a las empresas que utilizan el sistema.
+
+| Atributo | Tipo | Descripción | Restricciones |
+|----------|------|-------------|---------------|
+| id | UUID | Identificador único de la empresa | PK, Not Null |
+| nombre | VARCHAR(100) | Nombre de la empresa | Not Null |
+| razon_social | VARCHAR(100) | Razón social legal | Not Null |
+| cif_nif | VARCHAR(20) | CIF/NIF de la empresa | Unique, Not Null |
+| direccion | TEXT | Dirección física | Not Null |
+| codigo_postal | VARCHAR(10) | Código postal | Not Null |
+| ciudad | VARCHAR(50) | Ciudad | Not Null |
+| pais | VARCHAR(50) | País | Not Null, ISO 3166 |
+| telefono | VARCHAR(20) | Teléfono de contacto | Not Null |
+| email_contacto | VARCHAR(255) | Email de contacto general | Not Null |
+| logo_url | VARCHAR(500) | URL del logo de la empresa | Nullable |
+| plan_suscripcion | ENUM | Plan de suscripción (STARTER, PROFESSIONAL, ENTERPRISE) | Not Null |
+| fecha_alta | TIMESTAMP | Fecha de alta en el sistema | Not Null, Default NOW() |
+| estado | ENUM | Estado (ACTIVA, SUSPENDIDA, CANCELADA) | Not Null |
+
+#### 3. OfertaEmpleo
+Representa las ofertas de empleo publicadas por las empresas.
+
+| Atributo | Tipo | Descripción | Restricciones |
+|----------|------|-------------|---------------|
+| id | UUID | Identificador único de la oferta | PK, Not Null |
+| empresa_id | UUID | ID de la empresa | FK, Not Null |
+| creador_id | UUID | ID del reclutador que creó la oferta | FK, Not Null |
+| titulo | VARCHAR(100) | Título del puesto | Not Null, 5-100 caracteres |
+| descripcion | TEXT | Descripción detallada del puesto | Not Null, 50-5000 caracteres |
+| requisitos | TEXT | Requisitos del puesto | Nullable |
+| salario_minimo | DECIMAL(10,2) | Salario mínimo ofertado | Nullable, Positivo |
+| salario_maximo | DECIMAL(10,2) | Salario máximo ofertado | Nullable, Positivo |
+| moneda | VARCHAR(3) | Moneda del salario | Default EUR, ISO 4217 |
+| periodicidad_salario | ENUM | Periodicidad (HORA, MES, ANIO) | Nullable |
+| ubicacion | TEXT | Ubicación del puesto | Not Null |
+| modalidad | ENUM | Modalidad (PRESENCIAL, REMOTO, HIBRIDO) | Not Null |
+| tipo_contrato | ENUM | Tipo de contrato (INDEFINIDO, TEMPORAL, PRACTICAS) | Nullable |
+| jornada | ENUM | Jornada (COMPLETA, PARCIAL) | Nullable |
+| estado | ENUM | Estado (BORRADOR, ACTIVA, PAUSADA, CERRADA) | Not Null |
+| fecha_publicacion | TIMESTAMP | Fecha de publicación | Nullable |
+| fecha_cierre | TIMESTAMP | Fecha de cierre de la oferta | Nullable |
+| aprobado_por | UUID | ID del manager que aprobó | FK, Nullable |
+| fecha_aprobacion | TIMESTAMP | Fecha de aprobación | Nullable |
+| criterios_opcionales | JSON | Criterios opcionales para postular | Nullable |
+| created_at | TIMESTAMP | Fecha de creación | Not Null, Default NOW() |
+| updated_at | TIMESTAMP | Fecha de última actualización | Not Null, Default NOW() |
+
+#### 4. Candidato
+Representa el perfil de un candidato.
+
+| Atributo | Tipo | Descripción | Restricciones |
+|----------|------|-------------|---------------|
+| id | UUID | Identificador único del candidato | PK, Not Null |
+| usuario_id | UUID | ID del usuario asociado | FK, Unique, Not Null |
+| nombre | VARCHAR(50) | Nombre | Not Null |
+| apellido | VARCHAR(50) | Apellido | Not Null |
+| fecha_nacimiento | DATE | Fecha de nacimiento | Nullable |
+| nacionalidad | VARCHAR(50) | Nacionalidad | Nullable |
+| direccion | TEXT | Dirección | Nullable |
+| codigo_postal | VARCHAR(10) | Código postal | Nullable |
+| ciudad | VARCHAR(50) | Ciudad | Nullable |
+| pais | VARCHAR(50) | País | Nullable, ISO 3166 |
+| telefono | VARCHAR(20) | Teléfono | Nullable |
+| resumen | TEXT | Resumen profesional | Nullable, Máx 2000 caracteres |
+| disponibilidad | ENUM | Disponibilidad (INMEDIATA, 1_SEMANA, 1_MES, 3_MESES) | Nullable |
+| expectativa_salarial | DECIMAL(10,2) | Expectativa salarial | Nullable |
+| consentimiento_rgpd | BOOLEAN | Consentimiento RGPD | Not Null, Default FALSE |
+| fecha_consentimiento | TIMESTAMP | Fecha del consentimiento | Nullable |
+| perfil_completo | BOOLEAN | Indica si el perfil está 100% completo | Not Null, Default FALSE |
+| created_at | TIMESTAMP | Fecha de creación | Not Null, Default NOW() |
+| updated_at | TIMESTAMP | Fecha de última actualización | Not Null, Default NOW() |
+
+#### 5. TipoRecurso
+Representa los tipos de recursos externos que puede tener un candidato.
+
+| Atributo | Tipo | Descripción | Restricciones |
+|----------|------|-------------|---------------|
+| id | UUID | Identificador único del tipo de recurso | PK, Not Null |
+| nombre | VARCHAR(50) | Nombre del tipo de recurso | Unique, Not Null |
+| descripcion | TEXT | Descripción del tipo de recurso | Nullable |
+| activo | BOOLEAN | Indica si el tipo está activo | Not Null, Default TRUE |
+| created_at | TIMESTAMP | Fecha de creación | Not Null, Default NOW() |
+
+**Tipos predefinidos:** LINKEDIN, GITHUB, PORTAFOLIO, BEHANCE, DRIBBBLE, STACKOVERFLOW, PERSONAL_BLOG, OTRO
+
+#### 6. RecursoExterno
+Representa los recursos externos (URLs) asociados a un candidato.
+
+| Atributo | Tipo | Descripción | Restricciones |
+|----------|------|-------------|---------------|
+| id | UUID | Identificador único del recurso | PK, Not Null |
+| candidato_id | UUID | ID del candidato | FK, Not Null |
+| tipo_recurso_id | UUID | ID del tipo de recurso | FK, Not Null |
+| url | VARCHAR(500) | URL del recurso externo | Not Null |
+| titulo | VARCHAR(100) | Título descriptivo del recurso | Nullable |
+| verificado | BOOLEAN | Indica si la URL ha sido verificada | Not Null, Default FALSE |
+| fecha_verificacion | TIMESTAMP | Fecha de verificación de la URL | Nullable |
+| orden | INTEGER | Orden de visualización | Nullable |
+| created_at | TIMESTAMP | Fecha de creación | Not Null, Default NOW() |
+| updated_at | TIMESTAMP | Fecha de última actualización | Not Null, Default NOW() |
+
+**Índice único:** (candidato_id, tipo_recurso_id) - Permite un solo recurso de cada tipo por candidato
+
+#### 7. ExperienciaLaboral
+Representa la experiencia laboral de un candidato.
+
+| Atributo | Tipo | Descripción | Restricciones |
+|----------|------|-------------|---------------|
+| id | UUID | Identificador único | PK, Not Null |
+| candidato_id | UUID | ID del candidato | FK, Not Null |
+| empresa | VARCHAR(100) | Nombre de la empresa | Not Null |
+| puesto | VARCHAR(100) | Puesto desempeñado | Not Null |
+| descripcion | TEXT | Descripción de responsabilidades | Nullable |
+| fecha_inicio | DATE | Fecha de inicio | Not Null |
+| fecha_fin | DATE | Fecha de fin | Nullable |
+| actual | BOOLEAN | Indica si es el empleo actual | Not Null, Default FALSE |
+| created_at | TIMESTAMP | Fecha de creación | Not Null, Default NOW() |
+
+#### 8. Educacion
+Representa la educación de un candidato.
+
+| Atributo | Tipo | Descripción | Restricciones |
+|----------|------|-------------|---------------|
+| id | UUID | Identificador único | PK, Not Null |
+| candidato_id | UUID | ID del candidato | FK, Not Null |
+| institucion | VARCHAR(100) | Nombre de la institución | Not Null |
+| titulo | VARCHAR(100) | Título obtenido | Not Null |
+| nivel | ENUM | Nivel (SECUNDARIA, GRADO, MASTER, DOCTORADO) | Not Null |
+| area_estudio | VARCHAR(100) | Área de estudio | Nullable |
+| fecha_inicio | DATE | Fecha de inicio | Not Null |
+| fecha_fin | DATE | Fecha de fin | Nullable |
+| actual | BOOLEAN | Indica si es actual | Not Null, Default FALSE |
+| created_at | TIMESTAMP | Fecha de creación | Not Null, Default NOW() |
+
+#### 9. Habilidad
+Representa las habilidades de un candidato.
+
+| Atributo | Tipo | Descripción | Restricciones |
+|----------|------|-------------|---------------|
+| id | UUID | Identificador único | PK, Not Null |
+| candidato_id | UUID | ID del candidato | FK, Not Null |
+| nombre | VARCHAR(100) | Nombre de la habilidad | Not Null |
+| nivel | ENUM | Nivel (PRINCIPIANTE, INTERMEDIO, AVANZADO, EXPERTO) | Not Null |
+| tipo | ENUM | Tipo (TECNICA, BLANDA, IDIOMA) | Not Null |
+| created_at | TIMESTAMP | Fecha de creación | Not Null, Default NOW() |
+
+#### 10. Documento
+Representa los documentos cargados por candidatos.
+
+| Atributo | Tipo | Descripción | Restricciones |
+|----------|------|-------------|---------------|
+| id | UUID | Identificador único | PK, Not Null |
+| candidato_id | UUID | ID del candidato | FK, Not Null |
+| tipo | ENUM | Tipo (CV, CARTA_PRESENTACION, PORTAFOLIO, CERTIFICADO) | Not Null |
+| nombre_archivo | VARCHAR(255) | Nombre original del archivo | Not Null |
+| url_almacenamiento | VARCHAR(500) | URL de almacenamiento | Not Null |
+| tamaño_bytes | BIGINT | Tamaño en bytes | Not Null, Máx 10MB |
+| formato | VARCHAR(10) | Formato del archivo (pdf, doc, docx) | Not Null |
+| contenido_hash | VARCHAR(64) | Hash del contenido para verificación | Not Null |
+| estado_escaneo | ENUM | Estado del escaneo antivirus (PENDIENTE, LIMPIO, INFECTADO) | Not Null |
+| fecha_escaneo | TIMESTAMP | Fecha del escaneo antivirus | Nullable |
+| created_at | TIMESTAMP | Fecha de carga | Not Null, Default NOW() |
+
+#### 11. Candidatura
+Representa la postulación de un candidato a una oferta.
+
+| Atributo | Tipo | Descripción | Restricciones |
+|----------|------|-------------|---------------|
+| id | UUID | Identificador único | PK, Not Null |
+| candidato_id | UUID | ID del candidato | FK, Not Null |
+| oferta_id | UUID | ID de la oferta | FK, Not Null |
+| estado | ENUM | Estado (RECIBIDO, EN_REVISION, PRUEBA_TECNICA, ENTREVISTA, OFERTA, CONTRATADO, RECHAZADO, OFERTA_RECHAZADA) | Not Null |
+| fecha_postulacion | TIMESTAMP | Fecha de postulación | Not Null, Default NOW() |
+| fecha_ultimo_cambio | TIMESTAMP | Fecha del último cambio de estado | Not Null, Default NOW() |
+| notas_candidato | TEXT | Notas adicionales del candidato | Nullable, Máx 1000 caracteres |
+| cumple_criterios | BOOLEAN | Indica si cumple criterios opcionales | Nullable |
+| created_at | TIMESTAMP | Fecha de creación | Not Null, Default NOW() |
+| updated_at | TIMESTAMP | Fecha de última actualización | Not Null, Default NOW() |
+
+**Índice único:** (candidato_id, oferta_id) - Evita postulaciones duplicadas
+
+#### 12. PruebaTecnica
+Representa las pruebas técnicas asignadas.
+
+| Atributo | Tipo | Descripción | Restricciones |
+|----------|------|-------------|---------------|
+| id | UUID | Identificador único | PK, Not Null |
+| candidatura_id | UUID | ID de la candidatura | FK, Unique, Not Null |
+| tipo_prueba | ENUM | Tipo (CODIGO, TEST_HABILIDADES, PSICOMETRICO) | Not Null |
+| titulo | VARCHAR(100) | Título de la prueba | Not Null |
+| descripcion | TEXT | Descripción de la prueba | Nullable |
+| url_prueba | VARCHAR(500) | URL de la prueba | Nullable |
+| fecha_asignacion | TIMESTAMP | Fecha de asignación | Not Null, Default NOW() |
+| fecha_limite | TIMESTAMP | Fecha límite para completar | Not Null |
+| estado | ENUM | Estado (ASIGNADA, EN_PROGRESO, COMPLETADA, EXPIRADA) | Not Null |
+| calificacion | DECIMAL(5,2) | Calificación obtenida (0-100) | Nullable |
+| feedback | TEXT | Feedback de la prueba | Nullable, Máx 2000 caracteres |
+| fecha_completacion | TIMESTAMP | Fecha de completación | Nullable |
+| created_at | TIMESTAMP | Fecha de creación | Not Null, Default NOW() |
+
+#### 13. Entrevista
+Representa las entrevistas programadas.
+
+| Atributo | Tipo | Descripción | Restricciones |
+|----------|------|-------------|---------------|
+| id | UUID | Identificador único | PK, Not Null |
+| candidatura_id | UUID | ID de la candidatura | FK, Not Null |
+| reclutador_id | UUID | ID del reclutador | FK, Not Null |
+| tipo | ENUM | Tipo (VIDEO, PRESENCIAL, TELEFONICA) | Not Null |
+| fecha_programada | TIMESTAMP | Fecha y hora programada | Not Null, No pasado, Máx 6 meses futuro |
+| duracion_minutos | INTEGER | Duración estimada en minutos | Not Null |
+| ubicacion | TEXT | Ubicación o enlace de videoconferencia | Nullable |
+| estado | ENUM | Estado (PROGRAMADA, COMPLETADA, CANCELADA, REPROGRAMADA) | Not Null |
+| feedback | TEXT | Feedback de la entrevista | Nullable, Máx 2000 caracteres |
+| calificacion | DECIMAL(5,2) | Calificación (0-100) | Nullable |
+| fecha_realizacion | TIMESTAMP | Fecha de realización | Nullable |
+| created_at | TIMESTAMP | Fecha de creación | Not Null, Default NOW() |
+
+#### 14. OfertaContratacion
+Representa las ofertas de contratación enviadas a candidatos.
+
+| Atributo | Tipo | Descripción | Restricciones |
+|----------|------|-------------|---------------|
+| id | UUID | Identificador único | PK, Not Null |
+| candidatura_id | UUID | ID de la candidatura | FK, Unique, Not Null |
+| salario_ofrecido | DECIMAL(10,2) | Salario ofrecido | Not Null, Positivo |
+| moneda | VARCHAR(3) | Moneda | Default EUR, ISO 4217 |
+| beneficios | TEXT | Beneficios adicionales | Nullable |
+| fecha_inicio | DATE | Fecha de inicio propuesta | Not Null |
+| fecha_limite_respuesta | TIMESTAMP | Fecha límite para responder | Not Null |
+| estado | ENUM | Estado (ENVIADA, ACEPTADA, RECHAZADA, EXPIRADA) | Not Null |
+| fecha_envio | TIMESTAMP | Fecha de envío | Not Null, Default NOW() |
+| fecha_respuesta | TIMESTAMP | Fecha de respuesta | Nullable |
+| notas | TEXT | Notas adicionales | Nullable, Máx 1000 caracteres |
+| created_at | TIMESTAMP | Fecha de creación | Not Null, Default NOW() |
+
+#### 15. Notificacion
+Representa las notificaciones enviadas a usuarios.
+
+| Atributo | Tipo | Descripción | Restricciones |
+|----------|------|-------------|---------------|
+| id | UUID | Identificador único | PK, Not Null |
+| usuario_id | UUID | ID del usuario destinatario | FK, Not Null |
+| tipo | ENUM | Tipo (CAMBIO_ESTADO, NUEVA_OFERTA, ENTREVISTA, PRUEBA, OFERTA_CONTRATACION) | Not Null |
+| titulo | VARCHAR(200) | Título de la notificación | Not Null |
+| mensaje | TEXT | Contenido del mensaje | Not Null |
+| leida | BOOLEAN | Indica si fue leída | Not Null, Default FALSE |
+| fecha_envio | TIMESTAMP | Fecha de envío | Not Null, Default NOW() |
+| fecha_lectura | TIMESTAMP | Fecha de lectura | Nullable |
+| canal | ENUM | Canal (EMAIL, PUSH, SMS) | Not Null |
+| candidatura_id | UUID | ID de la candidatura relacionada | FK, Nullable |
+| created_at | TIMESTAMP | Fecha de creación | Not Null, Default NOW() |
+
+#### 16. ConfiguracionEmpresa
+Representa la configuración personalizada por empresa.
+
+| Atributo | Tipo | Descripción | Restricciones |
+|----------|------|-------------|---------------|
+| id | UUID | Identificador único | PK, Not Null |
+| empresa_id | UUID | ID de la empresa | FK, Unique, Not Null |
+| tiempo_limite_recibido | INTEGER | Horas límite en estado RECIBIDO | Nullable |
+| tiempo_limite_revision | INTEGER | Horas límite en estado EN_REVISION | Nullable |
+| tiempo_limite_prueba | INTEGER | Horas límite en estado PRUEBA_TECNICA | Nullable |
+| tiempo_limite_entrevista | INTEGER | Horas límite en estado ENTREVISTA | Nullable |
+| tiempo_limite_oferta | INTEGER | Horas límite en estado OFERTA | Nullable |
+| notificaciones_activas | BOOLEAN | Notificaciones automáticas activas | Not Null, Default TRUE |
+| feedback_rechazo | BOOLEAN | Enviar feedback al rechazar | Not Null, Default FALSE |
+| canales_publicacion | JSON | Canales de publicación configurados | Nullable |
+| created_at | TIMESTAMP | Fecha de creación | Not Null, Default NOW() |
+| updated_at | TIMESTAMP | Fecha de última actualización | Not Null, Default NOW() |
+
+#### 17. AuditoriaCambioEstado
+Representa el registro de auditoría de cambios de estado.
+
+| Atributo | Tipo | Descripción | Restricciones |
+|----------|------|-------------|---------------|
+| id | UUID | Identificador único | PK, Not Null |
+| candidatura_id | UUID | ID de la candidatura | FK, Not Null |
+| estado_anterior | ENUM | Estado anterior | Not Null |
+| estado_nuevo | ENUM | Estado nuevo | Not Null |
+| usuario_id | UUID | ID del usuario que realizó el cambio | FK, Not Null |
+| fecha_cambio | TIMESTAMP | Fecha y hora del cambio | Not Null, Default NOW() |
+| comentarios | TEXT | Comentarios sobre el cambio | Nullable |
+| ip_address | VARCHAR(45) | Dirección IP del usuario | Nullable |
+
+### Relaciones entre Entidades
+
+```mermaid
+erDiagram
+    USUARIO ||--o{ CANDIDATO : "es"
+    USUARIO ||--o{ OFERTA_EMPLEO : "crea"
+    USUARIO ||--o{ ENTREVISTA : "realiza"
+    USUARIO ||--o{ AUDITORIA_CAMBIO_ESTADO : "registra"
+    USUARIO ||--o{ NOTIFICACION : "recibe"
+    
+    EMPRESA ||--o{ USUARIO : "emplea"
+    EMPRESA ||--o{ OFERTA_EMPLEO : "publica"
+    EMPRESA ||--o{ CONFIGURACION_EMPRESA : "configura"
+    
+    OFERTA_EMPLEO ||--o{ CANDIDATURA : "recibe"
+    OFERTA_EMPLEO }o--|| USUARIO : "aprobada_por"
+    
+    CANDIDATO ||--o{ EXPERIENCIA_LABORAL : "tiene"
+    CANDIDATO ||--o{ EDUCACION : "tiene"
+    CANDIDATO ||--o{ HABILIDAD : "posee"
+    CANDIDATO ||--o{ DOCUMENTO : "carga"
+    CANDIDATO ||--o{ CANDIDATURA : "realiza"
+    CANDIDATO ||--o{ RECURSO_EXTERNO : "tiene"
+    
+    TIPO_RECURSO ||--o{ RECURSO_EXTERNO : "clasifica"
+    
+    CANDIDATURA ||--o| PRUEBA_TECNICA : "asignada"
+    CANDIDATURA ||--o{ ENTREVISTA : "tiene"
+    CANDIDATURA ||--o| OFERTA_CONTRATACION : "recibe"
+    CANDIDATURA ||--o{ NOTIFICACION : "genera"
+    CANDIDATURA ||--o{ AUDITORIA_CAMBIO_ESTADO : "registra"
+    
+    USUARIO {
+        UUID id PK
+        VARCHAR email UK
+        VARCHAR password_hash
+        VARCHAR nombre
+        VARCHAR apellido
+        VARCHAR telefono
+        ENUM rol
+        ENUM estado_cuenta
+        TIMESTAMP fecha_registro
+        BOOLEAN mfa_enabled
+        UUID empresa_id FK
+    }
+    
+    EMPRESA {
+        UUID id PK
+        VARCHAR nombre
+        VARCHAR razon_social
+        VARCHAR cif_nif UK
+        TEXT direccion
+        VARCHAR codigo_postal
+        VARCHAR ciudad
+        VARCHAR pais
+        VARCHAR telefono
+        VARCHAR email_contacto
+        ENUM plan_suscripcion
+        ENUM estado
+    }
+    
+    OFERTA_EMPLEO {
+        UUID id PK
+        UUID empresa_id FK
+        UUID creador_id FK
+        VARCHAR titulo
+        TEXT descripcion
+        DECIMAL salario_minimo
+        DECIMAL salario_maximo
+        VARCHAR moneda
+        TEXT ubicacion
+        ENUM modalidad
+        ENUM estado
+        TIMESTAMP fecha_publicacion
+        UUID aprobado_por FK
+        JSON criterios_opcionales
+    }
+    
+    CANDIDATO {
+        UUID id PK
+        UUID usuario_id "FK UK"
+        VARCHAR nombre
+        VARCHAR apellido
+        DATE fecha_nacimiento
+        TEXT direccion
+        VARCHAR telefono
+        TEXT resumen
+        DECIMAL expectativa_salarial
+        BOOLEAN consentimiento_rgpd
+        BOOLEAN perfil_completo
+    }
+    
+    TIPO_RECURSO {
+        UUID id PK
+        VARCHAR nombre UK
+        TEXT descripcion
+        BOOLEAN activo
+    }
+    
+    RECURSO_EXTERNO {
+        UUID id PK
+        UUID candidato_id FK
+        UUID tipo_recurso_id FK
+        VARCHAR url
+        VARCHAR titulo
+        BOOLEAN verificado
+        INTEGER orden
+    }
+    
+    EXPERIENCIA_LABORAL {
+        UUID id PK
+        UUID candidato_id FK
+        VARCHAR empresa
+        VARCHAR puesto
+        DATE fecha_inicio
+        DATE fecha_fin
+        BOOLEAN actual
+    }
+    
+    EDUCACION {
+        UUID id PK
+        UUID candidato_id FK
+        VARCHAR institucion
+        VARCHAR titulo
+        ENUM nivel
+        DATE fecha_inicio
+        DATE fecha_fin
+    }
+    
+    HABILIDAD {
+        UUID id PK
+        UUID candidato_id FK
+        VARCHAR nombre
+        ENUM nivel
+        ENUM tipo
+    }
+    
+    DOCUMENTO {
+        UUID id PK
+        UUID candidato_id FK
+        ENUM tipo
+        VARCHAR nombre_archivo
+        VARCHAR url_almacenamiento
+        BIGINT tamaño_bytes
+        VARCHAR formato
+        ENUM estado_escaneo
+    }
+    
+    CANDIDATURA {
+        UUID id PK
+        UUID candidato_id FK
+        UUID oferta_id FK
+        ENUM estado
+        TIMESTAMP fecha_postulacion
+        TIMESTAMP fecha_ultimo_cambio
+        BOOLEAN cumple_criterios
+    }
+    
+    PRUEBA_TECNICA {
+        UUID id PK
+        UUID candidatura_id "FK UK"
+        ENUM tipo_prueba
+        VARCHAR titulo
+        TIMESTAMP fecha_asignacion
+        TIMESTAMP fecha_limite
+        ENUM estado
+        DECIMAL calificacion
+    }
+    
+    ENTREVISTA {
+        UUID id PK
+        UUID candidatura_id FK
+        UUID reclutador_id FK
+        ENUM tipo
+        TIMESTAMP fecha_programada
+        INTEGER duracion_minutos
+        ENUM estado
+        DECIMAL calificacion
+    }
+    
+    OFERTA_CONTRATACION {
+        UUID id PK
+        UUID candidatura_id "FK UK"
+        DECIMAL salario_ofrecido
+        DATE fecha_inicio
+        TIMESTAMP fecha_limite_respuesta
+        ENUM estado
+    }
+    
+    NOTIFICACION {
+        UUID id PK
+        UUID usuario_id FK
+        ENUM tipo
+        VARCHAR titulo
+        TEXT mensaje
+        BOOLEAN leida
+        ENUM canal
+        UUID candidatura_id FK
+    }
+    
+    CONFIGURACION_EMPRESA {
+        UUID id PK
+        UUID empresa_id "FK UK"
+        INTEGER tiempo_limite_recibido
+        INTEGER tiempo_limite_revision
+        INTEGER tiempo_limite_prueba
+        INTEGER tiempo_limite_entrevista
+        INTEGER tiempo_limite_oferta
+        BOOLEAN notificaciones_activas
+    }
+    
+    AUDITORIA_CAMBIO_ESTADO {
+        UUID id PK
+        UUID candidatura_id FK
+        ENUM estado_anterior
+        ENUM estado_nuevo
+        UUID usuario_id FK
+        TIMESTAMP fecha_cambio
+        VARCHAR ip_address
+    }
+```
+
+### Descripción de Relaciones
+
+- **USUARIO - CANDIDATO**: Un usuario puede tener un perfil de candidato (1:0..1)
+- **USUARIO - OFERTA_EMPLEO**: Un usuario (reclutador) puede crear múltiples ofertas (1:N)
+- **USUARIO - ENTREVISTA**: Un usuario (reclutador) puede realizar múltiples entrevistas (1:N)
+- **EMPRESA - USUARIO**: Una empresa puede tener múltiples usuarios (reclutadores) (1:N)
+- **EMPRESA - OFERTA_EMPLEO**: Una empresa puede publicar múltiples ofertas (1:N)
+- **OFERTA_EMPLEO - CANDIDATURA**: Una oferta puede recibir múltiples candidaturas (1:N)
+- **CANDIDATO - CANDIDATURA**: Un candidato puede realizar múltiples candidaturas (1:N)
+- **CANDIDATO - RECURSO_EXTERNO**: Un candidato puede tener múltiples recursos externos (1:N)
+- **TIPO_RECURSO - RECURSO_EXTERNO**: Un tipo de recurso clasifica múltiples recursos externos (1:N)
+- **CANDIDATURA - PRUEBA_TECNICA**: Una candidatura tiene una prueba técnica asignada (1:1)
+- **CANDIDATURA - ENTREVISTA**: Una candidatura puede tener múltiples entrevistas (1:N)
+- **CANDIDATURA - OFERTA_CONTRATACION**: Una candidatura puede tener una oferta de contratación (1:0..1)
+- **CANDIDATURA - AUDITORIA_CAMBIO_ESTADO**: Una candidatura puede tener múltiples registros de auditoría (1:N)
+
+---
+
 ## Estado del Proyecto
  
 - **Especificación funcional**: Completada
